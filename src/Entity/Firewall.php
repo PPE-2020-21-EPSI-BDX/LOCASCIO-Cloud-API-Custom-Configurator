@@ -38,11 +38,11 @@ class Firewall
 
     #[ORM\Column(type: 'string', nullable: true)]
     #[Groups(['read:Firewall'])]
-    private ?int $wan_port_throughput;
+    private ?string $wan_port_throughput;
 
     #[ORM\Column(type: 'string', nullable: true)]
     #[Groups(['read:Firewall'])]
-    private ?int $lan_port_throughput;
+    private ?string $lan_port_throughput;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['read:Firewall'])]
