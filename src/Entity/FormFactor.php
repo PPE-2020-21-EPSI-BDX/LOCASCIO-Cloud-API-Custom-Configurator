@@ -7,6 +7,7 @@ use App\Repository\FormFactorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FormFactorRepository::class)]
@@ -31,9 +32,9 @@ class FormFactor
 
     #[ORM\OneToMany(mappedBy: 'form_factor', targetEntity: Firewall::class)]
     #[Groups(['read:FormFactor'])]
-    private ArrayCollection $firewalls;
+    private Collection $firewalls;
 
-    public function __construct()
+    #[Pure] public function __construct()
     {
         $this->firewalls = new ArrayCollection();
     }
