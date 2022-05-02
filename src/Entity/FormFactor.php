@@ -7,21 +7,31 @@ use App\Repository\FormFactorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FormFactorRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations: ['get'],
+    itemOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['read:FormFactor']]
+        ]
+    ]
+)]
 class FormFactor
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private int $id;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $name;
+    #[Groups(['read:FormFactor'])]
+    private ?string $name;
 
     #[ORM\OneToMany(mappedBy: 'form_factor', targetEntity: Firewall::class)]
-    private $firewalls;
+    #[Groups(['read:FormFactor'])]
+    private ArrayCollection $firewalls;
 
     public function __construct()
     {
