@@ -9,15 +9,19 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: FormFactorRepository::class)]
 #[ApiResource(
     collectionOperations: ['get'],
     itemOperations: [
         'get' => [
-            'normalization_context' => ['groups' => ['read:FormFactor']]
-        ]
-    ]
+            'normalization_context' => [
+                'groups' => ['read:FormFactor'],
+                'enable_max_depth' => true
+            ]
+        ],
+    ],
 )]
 class FormFactor
 {
@@ -32,6 +36,7 @@ class FormFactor
 
     #[ORM\OneToMany(mappedBy: 'form_factor', targetEntity: Firewall::class)]
     #[Groups(['read:FormFactor'])]
+    #[MaxDepth(1)]
     private Collection $firewalls;
 
     #[Pure] public function __construct()
