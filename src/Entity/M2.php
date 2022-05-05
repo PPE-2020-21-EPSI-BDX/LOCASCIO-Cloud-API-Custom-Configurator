@@ -9,9 +9,18 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: M2Repository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations: ['get'],
+    itemOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['read:M2', 'read:FormFactor', 'read:MotherBoard']]
+        ]
+    ]
+)]
 class M2
 {
     #[ORM\Id]
@@ -20,36 +29,47 @@ class M2
     private int $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['read:M2'])]
     private string $name;
 
     #[ORM\ManyToMany(targetEntity: FormFactor::class, inversedBy: 'm2s')]
-    private Collection $form_factor;
+    #[Groups(['read:FormFactor'])]
+    #[MaxDepth(1)]
+    private FormFactor $form_factor;
 
     #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'm2')]
-    private Collection $motherboards;
+    #[Groups(['read:Motherboard'])]
+    #[MaxDepth(1)]
+    private Motherboard $motherboards;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    #[Groups(['read:M2'])]
     private ?string $availability;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['read:M2'])]
     private ?\DateTimeInterface $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:M2'])]
     private ?string $provider_reference;
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $url;
 
     #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
+    #[Groups(['read:M2'])]
     private ?Decimal $price;
 
     #[ORM\ManyToOne(targetEntity: FormFactor::class, inversedBy: 'm2s')]
-    private $interface;
+    #[Groups(['read:FormFactor'])]
+    #[MaxDepth(1)]
+    private FormFactor $interface;
 
     #[Pure] public function __construct()
     {
-        $this->form_factor = new ArrayCollection();
-        $this->motherboards = new ArrayCollection();
+        $this->form_factor = new FormFactor();
+        $this->motherboards = new Motherboard();
     }
 
     public function getId(): ?int
@@ -70,9 +90,9 @@ class M2
     }
 
     /**
-     * @return Collection<int, FormFactor>
+     * @return FormFactor
      */
-    public function getFormFactor(): Collection
+    public function getFormFactor(): FormFactor
     {
         return $this->form_factor;
     }
@@ -94,9 +114,9 @@ class M2
     }
 
     /**
-     * @return Collection<int, Motherboard>
+     * @return Motherboard
      */
-    public function getMotherboards(): Collection
+    public function getMotherboards(): Motherboard
     {
         return $this->motherboards;
     }
