@@ -9,9 +9,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BareboneRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations: ['get'],
+    itemOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['read:Barebone', 'read:Motherboard']]
+        ]
+    ]
+)]
 class Barebone
 {
     #[ORM\Id]
@@ -20,24 +28,30 @@ class Barebone
     private int $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['read:Barebone'])]
     private string $name;
 
     #[ORM\ManyToMany(targetEntity: Motherboard::class, inversedBy: 'barbones')]
+    #[Groups(['read:Motherboard'])]
     private Collection $motherboard;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    #[Groups(['read:Barebone'])]
     private ?string $availability;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['read:Barebone'])]
     private ?\DateTimeInterface $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Barebone'])]
     private ?string $provider_reference;
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $url;
 
     #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
+    #[Groups(['read:Barebone'])]
     private ?Decimal $price;
 
     #[Pure] public function __construct()
