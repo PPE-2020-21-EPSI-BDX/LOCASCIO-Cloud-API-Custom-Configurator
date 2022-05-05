@@ -9,9 +9,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MemoryRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations: ['get'],
+    itemOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['read:Memory']]
+        ]
+    ]
+)]
 class Memory
 {
     #[ORM\Id]
@@ -20,53 +28,67 @@ class Memory
     private int $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['read:Memory'])]
     private string $name;
 
     #[ORM\Column(type: 'string', length: 50)]
+    #[Groups(['read:Memory'])]
     private string $brand;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    #[Groups(['read:Memory'])]
     private ?string $availability;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['read:Memory'])]
     private ?\DateTimeInterface $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read_detail:Memory'])]
     private ?string $provider_reference;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Memory'])]
     private ?string $capacity;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read_detail:Memory'])]
     private ?string $cas;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['read_detail:Memory'])]
     private ?int $number;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Memory'])]
     private ?string $type;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Memory'])]
     private ?string $freq;
 
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['read:Memory'])]
     private bool $ecc;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read_detail:Memory'])]
     private ?string $application;
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $url;
 
     #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
+    #[Groups(['read:Memory'])]
     private Decimal $price;
 
     #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'mem_type')]
-    private Collection $motherboards;
+    #[Groups(['read:Memory'])]
+    private Motherboard $motherboards;
 
     #[Pure] public function __construct()
     {
-        $this->motherboards = new ArrayCollection();
+        $this->motherboards = new Motherboard();
     }
 
     public function getId(): ?int
