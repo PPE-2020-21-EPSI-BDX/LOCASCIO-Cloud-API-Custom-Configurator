@@ -39,9 +39,19 @@ class FormFactor
     #[MaxDepth(1)]
     private Collection $firewalls;
 
+    #[ORM\OneToMany(mappedBy: 'for_factor', targetEntity: Motherboard::class)]
+    #[Groups(['read:FormFactor'])]
+    private Collection $motherboards;
+
+    #[ORM\OneToMany(mappedBy: 'interface', targetEntity: M2::class)]
+    #[Groups(['read:FormFactor'])]
+    private Collection $m2s;
+
     #[Pure] public function __construct()
     {
         $this->firewalls = new ArrayCollection();
+        $this->motherboards = new ArrayCollection();
+        $this->m2s = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -86,6 +96,63 @@ class FormFactor
             if ($firewall->getFormFactor() === $this) {
                 $firewall->setFormFactor(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Motherboard>
+     */
+    public function getMotherboards(): Collection
+    {
+        return $this->motherboards;
+    }
+
+    public function addMotherboard(Motherboard $motherboard): self
+    {
+        if (!$this->motherboards->contains($motherboard)) {
+            $this->motherboards[] = $motherboard;
+            $motherboard->setForFactor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMotherboard(Motherboard $motherboard): self
+    {
+        if ($this->motherboards->removeElement($motherboard)) {
+            // set the owning side to null (unless already changed)
+            if ($motherboard->getForFactor() === $this) {
+                $motherboard->setForFactor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, M2>
+     */
+    public function getM2s(): Collection
+    {
+        return $this->m2s;
+    }
+
+    public function addM2(M2 $m2): self
+    {
+        if (!$this->m2s->contains($m2)) {
+            $this->m2s[] = $m2;
+            $m2->addFormFactor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeM2(M2 $m2): self
+    {
+        if ($this->m2s->removeElement($m2)) {
+            $m2->removeFormFactor($this);
         }
 
         return $this;
