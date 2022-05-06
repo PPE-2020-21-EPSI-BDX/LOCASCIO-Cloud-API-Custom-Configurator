@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     itemOperations: [
         'get' => [
             'normalization_context' => [
-                'groups' => ['read:FormFactor'],
+                'groups' => ['read:FormFactor', 'read:MotherBoard'],
                 'enable_max_depth' => true
             ]
         ],
@@ -40,11 +40,13 @@ class FormFactor
     private Collection $firewalls;
 
     #[ORM\OneToMany(mappedBy: 'for_factor', targetEntity: Motherboard::class)]
-    #[Groups(['read:FormFactor'])]
+    #[Groups(['read:MotherBoard'])]
+    #[MaxDepth(1)]
     private Collection $motherboards;
 
     #[ORM\OneToMany(mappedBy: 'interface', targetEntity: M2::class)]
     #[Groups(['read:FormFactor'])]
+    #[MaxDepth(1)]
     private Collection $m2s;
 
     #[Pure] public function __construct()

@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: MotherboardRepository::class)]
 #[ApiResource]
@@ -23,12 +24,14 @@ class Motherboard
     private string $name;
 
     #[ORM\ManyToOne(targetEntity: FormFactor::class, inversedBy: 'motherboards')]
+    #[MaxDepth(1)]
     private Collection $form_factor;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $dimension;
 
     #[ORM\ManyToMany(targetEntity: Processor::class, inversedBy: 'motherboards')]
+    #[MaxDepth(1)]
     private Collection $processors;
 
     #[ORM\Column(type: 'text', nullable: true)]
@@ -38,12 +41,14 @@ class Motherboard
     private int $mem_slots;
 
     #[ORM\ManyToMany(targetEntity: Memory::class, inversedBy: 'motherboards')]
+    #[MaxDepth(1)]
     private Collection $mem_type;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $nbr_max_sata;
 
     #[ORM\ManyToOne(targetEntity: RAID::class, inversedBy: 'motherboards')]
+    #[MaxDepth(1)]
     private Collection $raid_support;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
@@ -65,12 +70,15 @@ class Motherboard
     private ?string $tpm;
 
     #[ORM\ManyToMany(targetEntity: PCIE::class, inversedBy: 'motherboards')]
+    #[MaxDepth(1)]
     private Collection $pci_e_support;
 
     #[ORM\ManyToMany(targetEntity: M2::class, inversedBy: 'motherboards')]
+    #[MaxDepth(1)]
     private Collection $m2;
 
     #[ORM\ManyToMany(targetEntity: BareBone::class, mappedBy: 'motherboard')]
+    #[MaxDepth(1)]
     private Collection $barbones;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]

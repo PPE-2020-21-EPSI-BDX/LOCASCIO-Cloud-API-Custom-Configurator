@@ -6,6 +6,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\FirewallRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: FirewallRepository::class)]
 #[ApiResource(
@@ -65,6 +66,7 @@ class Firewall
 
     #[ORM\ManyToOne(targetEntity: FormFactor::class, inversedBy: 'firewalls')]
     #[Groups(['read:FormFactor'])]
+    #[MaxDepth(1)]
     private ?FormFactor $form_factor;
 
     public function getId(): ?int

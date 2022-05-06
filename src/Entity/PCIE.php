@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: PCIERepository::class)]
 #[ApiResource]
@@ -28,12 +29,15 @@ class PCIE
     private ?string $format;
 
     #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'pci_e_support')]
+    #[MaxDepth(1)]
     private Collection $motherboards;
 
     #[ORM\OneToMany(mappedBy: 'interface', targetEntity: M2::class)]
+    #[MaxDepth(1)]
     private Collection $m2s;
 
     #[ORM\OneToMany(mappedBy: 'pcie', targetEntity: RAID::class)]
+    #[MaxDepth(1)]
     private Collection $raids;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]

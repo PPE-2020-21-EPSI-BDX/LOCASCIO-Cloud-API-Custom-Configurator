@@ -10,13 +10,14 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: MemoryRepository::class)]
 #[ApiResource(
     collectionOperations: ['get'],
     itemOperations: [
         'get' => [
-            'normalization_context' => ['groups' => ['read:Memory']]
+            'normalization_context' => ['groups' => ['read:Memory', 'read:Motherboard']]
         ]
     ]
 )]
@@ -83,7 +84,8 @@ class Memory
     private Decimal $price;
 
     #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'mem_type')]
-    #[Groups(['read:Memory'])]
+    #[Groups(['read:Motherboard'])]
+    #[MaxDepth(1)]
     private Motherboard $motherboards;
 
     #[Pure] public function __construct()

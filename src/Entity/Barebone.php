@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: BareboneRepository::class)]
 #[ApiResource(
@@ -33,6 +34,7 @@ class Barebone
 
     #[ORM\ManyToMany(targetEntity: Motherboard::class, inversedBy: 'barbones')]
     #[Groups(['read:Motherboard'])]
+    #[MaxDepth(1)]
     private Collection $motherboard;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]

@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: ProcessorRepository::class)]
 #[ApiResource]
@@ -83,6 +84,7 @@ class Processor
     private Decimal $price;
 
     #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'processors')]
+    #[MaxDepth(1)]
     private Collection $motherboards;
 
     #[Pure] public function __construct()

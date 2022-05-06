@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: RAIDRepository::class)]
 #[ApiResource]
@@ -37,9 +38,11 @@ class RAID
     private int  $nbr_port_sata;
 
     #[ORM\OneToMany(mappedBy: 'raid_support', targetEntity: Motherboard::class)]
+    #[MaxDepth(1)]
     private Collection $motherboards;
 
     #[ORM\ManyToOne(targetEntity: PCIE::class, inversedBy: 'raids')]
+    #[MaxDepth(1)]
     private Collection $pcie;
 
     #[Pure] public function __construct()
