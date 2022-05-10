@@ -2,7 +2,6 @@
 
 namespace App\Tests;
 
-
 class FormFactorEndpointTest extends ParentTest
 {
     /**
