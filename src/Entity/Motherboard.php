@@ -9,10 +9,21 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: MotherboardRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations: ['get'],
+    itemOperations: [
+        'get' => [
+            'normalization_context' => [
+                'groups' => ['read:Motherboard', 'read:FormFactor', 'read:Motherboard_detail', 'read:Processor', 'read:Memory'],
+                'enable_max_depth' => true
+            ]
+        ]
+    ]
+)]
 class Motherboard
 {
     #[ORM\Id]
@@ -21,79 +32,101 @@ class Motherboard
     private int $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['read:Motherboard'])]
     private string $name;
 
     #[ORM\ManyToOne(targetEntity: FormFactor::class, inversedBy: 'motherboards')]
+    #[Groups(['read:FormFactor'])]
     #[MaxDepth(1)]
     private Collection $form_factor;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:Motherboard_detail'])]
     private ?string $dimension;
 
     #[ORM\ManyToMany(targetEntity: Processor::class, inversedBy: 'motherboards')]
+    #[Groups(['read:Processor'])]
     #[MaxDepth(1)]
     private Collection $processors;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['read:Motherboard_detail'])]
     private ?string $processor_note;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Motherboard_detail'])]
     private int $mem_slots;
 
     #[ORM\ManyToMany(targetEntity: Memory::class, inversedBy: 'motherboards')]
+    #[Groups(['read:Memory'])]
     #[MaxDepth(1)]
     private Collection $mem_type;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['read:Motherboard'])]
     private ?int $nbr_max_sata;
 
     #[ORM\ManyToOne(targetEntity: RAID::class, inversedBy: 'motherboards')]
+    #[Groups(['read:Motherboard_detail'])]
     #[MaxDepth(1)]
     private Collection $raid_support;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    #[Groups(['read:Motherboard_detail'])]
     private ?string $stata_speed;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:Motherboard'])]
     private ?string $lan;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:Motherboard_detail'])]
     private ?string $usb;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:Motherboard_detail'])]
     private ?string $video_output;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:Motherboard_detail'])]
     private ?string $dom;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:Motherboard_detail'])]
     private ?string $tpm;
 
     #[ORM\ManyToMany(targetEntity: PCIE::class, inversedBy: 'motherboards')]
+    #[Groups(['read:Motherboard_detail'])]
     #[MaxDepth(1)]
     private Collection $pci_e_support;
 
     #[ORM\ManyToMany(targetEntity: M2::class, inversedBy: 'motherboards')]
+    #[Groups(['read:Motherboard'])]
     #[MaxDepth(1)]
     private Collection $m2;
 
     #[ORM\ManyToMany(targetEntity: BareBone::class, mappedBy: 'motherboard')]
+    #[Groups(['read:Motherboard'])]
     #[MaxDepth(1)]
     private Collection $barbones;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    #[Groups(['read:Motherboard'])]
     private ?string $availability;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['read:Motherboard'])]
     private ?\DateTimeInterface $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Motherboard_detail'])]
     private ?string $provider_reference;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $url;
 
     #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
+    #[Groups(['read:Motherboard'])]
     private ?Decimal $price;
 
     #[Pure] public function __construct()

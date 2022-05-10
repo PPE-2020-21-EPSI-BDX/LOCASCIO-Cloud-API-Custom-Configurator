@@ -17,7 +17,10 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     collectionOperations: ['get'],
     itemOperations: [
         'get' => [
-            'normalization_context' => ['groups' => ['read:Memory', 'read:Motherboard']]
+            'normalization_context' => [
+                'groups' => ['read:Memory', 'read:Motherboard', 'read:Memory_detail'],
+                'enable_max_depth' => true
+            ]
         ]
     ]
 )]
@@ -45,7 +48,7 @@ class Memory
     private ?\DateTimeInterface $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read_detail:Memory'])]
+    #[Groups(['read:Memory_detail'])]
     private ?string $provider_reference;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
@@ -53,11 +56,11 @@ class Memory
     private ?string $capacity;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read_detail:Memory'])]
+    #[Groups(['read:Memory_detail'])]
     private ?string $cas;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['read_detail:Memory'])]
+    #[Groups(['read:Memory_detail'])]
     private ?int $number;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
@@ -73,7 +76,7 @@ class Memory
     private bool $ecc;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read_detail:Memory'])]
+    #[Groups(['read:Memory_detail'])]
     private ?string $application;
 
     #[ORM\Column(type: 'string', length: 255)]
