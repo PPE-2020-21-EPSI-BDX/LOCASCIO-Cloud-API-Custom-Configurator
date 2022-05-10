@@ -108,7 +108,7 @@ class Motherboard
     #[ORM\ManyToMany(targetEntity: BareBone::class, mappedBy: 'motherboard')]
     #[Groups(['read:Motherboard'])]
     #[MaxDepth(1)]
-    private Collection $barbones;
+    private ArrayCollection $barbones;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
     #[Groups(['read:Motherboard'])]

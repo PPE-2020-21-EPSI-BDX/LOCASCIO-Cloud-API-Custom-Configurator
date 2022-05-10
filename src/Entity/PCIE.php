@@ -8,10 +8,21 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: PCIERepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations: ['get'],
+    itemOperations: [
+        'get' => [
+            'normalization_context' => [
+                'groups' => ['read:Pcie', 'read:Motherboard', 'read:M2', 'read:Raid'],
+                'enable_max_depth' => true
+            ]
+        ]
+    ]
+)]
 class PCIE
 {
     #[ORM\Id]
@@ -20,30 +31,38 @@ class PCIE
     private int $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['read:Pcie'])]
     private string $name;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Pcie'])]
     private int $version;
 
     #[ORM\Column(type: 'string', length: 4, nullable: true)]
+    #[Groups(['read:Pcie'])]
     private ?string $format;
 
     #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'pci_e_support')]
+    #[Groups(['read:Motherboard'])]
     #[MaxDepth(1)]
     private Collection $motherboards;
 
     #[ORM\OneToMany(mappedBy: 'interface', targetEntity: M2::class)]
+    #[Groups(['read:M2'])]
     #[MaxDepth(1)]
     private Collection $m2s;
 
     #[ORM\OneToMany(mappedBy: 'pcie', targetEntity: RAID::class)]
+    #[Groups(['read:Raid'])]
     #[MaxDepth(1)]
     private Collection $raids;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    #[Groups(['read:Pcie'])]
     private ?string $availability;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['read:Pcie'])]
     private ?\DateTimeInterface $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
@@ -53,6 +72,7 @@ class PCIE
     private string $url;
 
     #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
+    #[Groups(['read:Pcie'])]
     private ?string $price;
 
     #[Pure] public function __construct()
