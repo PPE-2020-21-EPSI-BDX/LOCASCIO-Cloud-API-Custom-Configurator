@@ -4,14 +4,26 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\RAIDRepository;
+use Decimal\Decimal;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: RAIDRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations: ['get'],
+    itemOperations: [
+        'get' => [
+            'normalization_context' => [
+                'groups' => ['read:Motherboard', 'read:FormFactor', 'read:Motherboard_detail', 'read:Processor', 'read:Memory'],
+                'enable_max_depth' => true
+            ]
+        ]
+    ]
+)]
 class RAID
 {
     #[ORM\Id]
@@ -20,30 +32,57 @@ class RAID
     private int $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['read:Raid'])]
     private string $name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Raid'])]
     private string $raid_level;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['read:Raid'])]
     private string $interface_support;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Raid'])]
     private string $data_transfer_rate;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Raid'])]
     private int $nbr_port_sas;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read:Raid'])]
     private int  $nbr_port_sata;
 
     #[ORM\OneToMany(mappedBy: 'raid_support', targetEntity: Motherboard::class)]
+    #[Groups(['read:Motherboard'])]
     #[MaxDepth(1)]
     private Collection $motherboards;
 
     #[ORM\ManyToOne(targetEntity: PCIE::class, inversedBy: 'raids')]
+    #[Groups(['read:PCIE'])]
     #[MaxDepth(1)]
     private Collection $pcie;
+
+    #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    #[Groups(['read:Raid'])]
+    private ?string $availability;
+
+    #[ORM\Column(type: 'datetime',  nullable: true)]
+    #[Groups(['read:Raid'])]
+    private ?\DateTimeInterface $delivery;
+
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Raid'])]
+    private ?string $provider_reference;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $url;
+
+    #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
+    #[Groups(['read:Raid'])]
+    private ?Decimal $price;
 
     #[Pure] public function __construct()
     {
@@ -189,6 +228,66 @@ class RAID
     public function setPcie(?PCIE $pcie): self
     {
         $this->pcie = $pcie;
+
+        return $this;
+    }
+
+    public function getAvailability(): ?string
+    {
+        return $this->availability;
+    }
+
+    public function setAvailability(?string $availability): self
+    {
+        $this->availability = $availability;
+
+        return $this;
+    }
+
+    public function getDelivery(): ?\DateTimeInterface
+    {
+        return $this->delivery;
+    }
+
+    public function setDelivery(\DateTimeInterface $delivery): self
+    {
+        $this->delivery = $delivery;
+
+        return $this;
+    }
+
+    public function getProviderReference(): ?string
+    {
+        return $this->provider_reference;
+    }
+
+    public function setProviderReference(?string $provider_reference): self
+    {
+        $this->provider_reference = $provider_reference;
+
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(string $url): self
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    public function getPrice(): ?string
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?string $price): self
+    {
+        $this->price = $price;
 
         return $this;
     }
