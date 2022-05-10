@@ -105,11 +105,6 @@ class Motherboard
     #[MaxDepth(1)]
     private Collection $m2;
 
-    #[ORM\ManyToMany(targetEntity: BareBone::class, mappedBy: 'motherboard')]
-    #[Groups(['read:Motherboard'])]
-    #[MaxDepth(1)]
-    private ArrayCollection $barbones;
-
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
     #[Groups(['read:Motherboard'])]
     private ?string $availability;
@@ -129,6 +124,10 @@ class Motherboard
     #[Groups(['read:Motherboard'])]
     private ?Decimal $price;
 
+    #[ORM\ManyToMany(targetEntity: Barebone::class, mappedBy: 'motherboard')]
+    #[Groups(['read:Motherboard'])]
+    private ArrayCollection $barebones;
+
     #[Pure] public function __construct()
     {
         $this->processors = new ArrayCollection();
@@ -136,6 +135,7 @@ class Motherboard
         $this->pci_e_support = new ArrayCollection();
         $this->m2 = new ArrayCollection();
         $this->barbones = new ArrayCollection();
+        $this->barebones = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -395,33 +395,6 @@ class Motherboard
         return $this;
     }
 
-    /**
-     * @return Collection<int, BareBone>
-     */
-    public function getBarbones(): Collection
-    {
-        return $this->barbones;
-    }
-
-    public function addBarbone(BareBone $barbone): self
-    {
-        if (!$this->barbones->contains($barbone)) {
-            $this->barbones[] = $barbone;
-            $barbone->addMotherboard($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBarbone(BareBone $barbone): self
-    {
-        if ($this->barbones->removeElement($barbone)) {
-            $barbone->removeMotherboard($this);
-        }
-
-        return $this;
-    }
-
     public function getAvailability(): ?string
     {
         return $this->availability;
@@ -478,6 +451,33 @@ class Motherboard
     public function setPrice(?string $price): self
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Barebone>
+     */
+    public function getBarebones(): Collection
+    {
+        return $this->barebones;
+    }
+
+    public function addBarebone(Barebone $barebone): self
+    {
+        if (!$this->barebones->contains($barebone)) {
+            $this->barebones[] = $barebone;
+            $barebone->addMotherboard($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBarebone(Barebone $barebone): self
+    {
+        if ($this->barebones->removeElement($barebone)) {
+            $barebone->removeMotherboard($this);
+        }
 
         return $this;
     }

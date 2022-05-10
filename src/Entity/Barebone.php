@@ -35,11 +35,6 @@ class Barebone
     #[Groups(['read:Barebone'])]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: Motherboard::class, inversedBy: 'barbones')]
-    #[Groups(['read:Motherboard'])]
-    #[MaxDepth(1)]
-    private Collection $motherboard;
-
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
     #[Groups(['read:Barebone'])]
     private ?string $availability;
@@ -59,7 +54,12 @@ class Barebone
     #[Groups(['read:Barebone'])]
     private ?Decimal $price;
 
-    #[Pure] public function __construct()
+    #[ORM\ManyToMany(targetEntity: Motherboard::class, inversedBy: 'barebones')]
+    #[Groups(['read:Motherboard'])]
+    private ArrayCollection $motherboard;
+
+    #[Pure]
+    public function __construct()
     {
         $this->motherboard = new ArrayCollection();
     }
@@ -77,30 +77,6 @@ class Barebone
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Motherboard>
-     */
-    public function getMotherboard(): Collection
-    {
-        return $this->motherboard;
-    }
-
-    public function addMotherboard(Motherboard $motherboard): self
-    {
-        if (!$this->motherboard->contains($motherboard)) {
-            $this->motherboard[] = $motherboard;
-        }
-
-        return $this;
-    }
-
-    public function removeMotherboard(Motherboard $motherboard): self
-    {
-        $this->motherboard->removeElement($motherboard);
 
         return $this;
     }
@@ -161,6 +137,30 @@ class Barebone
     public function setPrice(?string $price): self
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Motherboard>
+     */
+    public function getMotherboard(): Collection
+    {
+        return $this->motherboard;
+    }
+
+    public function addMotherboard(Motherboard $motherboard): self
+    {
+        if (!$this->motherboard->contains($motherboard)) {
+            $this->motherboard[] = $motherboard;
+        }
+
+        return $this;
+    }
+
+    public function removeMotherboard(Motherboard $motherboard): self
+    {
+        $this->motherboard->removeElement($motherboard);
 
         return $this;
     }
