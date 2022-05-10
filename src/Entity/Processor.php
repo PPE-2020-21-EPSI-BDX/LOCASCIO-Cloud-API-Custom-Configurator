@@ -9,10 +9,21 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: ProcessorRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations: ['get'],
+    itemOperations: [
+        'get' => [
+            'normalization_context' => [
+                'groups' => ['read:Processor', 'read:Processor_detail', 'read:Motherboard'],
+                'enable_max_depth' => true
+            ]
+        ]
+    ]
+)]
 class Processor
 {
     #[ORM\Id]
@@ -21,69 +32,90 @@ class Processor
     private int $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['read:Processor'])]
     private string $name;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    #[Groups(['read:Processor'])]
     private ?string $brand;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    #[Groups(['read:Processor'])]
     private ?string $availability;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['read:Processor'])]
     private ?string $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Processor_detail'])]
     private ?string $provider_reference;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Processor_detail'])]
     private ?string $socket;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['read:Processor_detail'])]
     private ?int $upi;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['read:Processor'])]
     private ?int $cores;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['read:Processor_detail'])]
     private ?int $threads;
 
     #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    #[Groups(['read:Processor'])]
     private ?string $tdp;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Processor'])]
     private ?string $baseFreq;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Processor_detail'])]
     private ?string $boostFreq;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Processor'])]
     private ?string $cache;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Processor_detail'])]
     private ?string $max_mem_capacity;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Processor_detail'])]
     private ?string $max_mem_speed;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Processor_detail'])]
     private ?string $mem_type;
 
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['read:Processor_detail'])]
     private bool $ecc;
 
     #[ORM\Column(type: 'boolean')]
+    #[Groups(['read:Processor_detail'])]
     private bool $graficsProcessor;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[Groups(['read:Processor_detail'])]
     private ?string $application;
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $url;
 
     #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
+    #[Groups(['read:Processor'])]
     private Decimal $price;
 
     #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'processors')]
+    #[Groups(['read:Motherboard'])]
     #[MaxDepth(1)]
     private Collection $motherboards;
 

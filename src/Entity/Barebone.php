@@ -17,7 +17,10 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     collectionOperations: ['get'],
     itemOperations: [
         'get' => [
-            'normalization_context' => ['groups' => ['read:Barebone', 'read:Motherboard']]
+            'normalization_context' => [
+                'groups' => ['read:Barebone', 'read:Motherboard'],
+                'enable_max_depth' => true
+            ]
         ]
     ]
 )]
