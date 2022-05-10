@@ -2,7 +2,6 @@
 
 namespace App\Tests;
 
-use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class BareboneTest extends ParentTest

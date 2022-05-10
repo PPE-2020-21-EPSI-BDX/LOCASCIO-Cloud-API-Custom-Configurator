@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     itemOperations: [
         'get' => [
             'normalization_context' => [
-                'groups' => ['read:FormFactor', 'read:MotherBoard'],
+                'groups' => ['read:FormFactor'],
                 'enable_max_depth' => true
             ]
         ],
@@ -40,20 +40,20 @@ class FormFactor
     private Collection $firewalls;
 
     #[ORM\OneToMany(mappedBy: 'for_factor', targetEntity: Motherboard::class)]
-    #[Groups(['read:MotherBoard'])]
+    #[Groups(['read:FormFactor'])]
     #[MaxDepth(1)]
     private Collection $motherboards;
 
-    #[ORM\OneToMany(mappedBy: 'interface', targetEntity: M2::class)]
+    #[ORM\OneToMany(mappedBy: 'form_factor', targetEntity: M2::class)]
     #[Groups(['read:FormFactor'])]
     #[MaxDepth(1)]
-    private Collection $m2s;
+    private Collection $m2s_form_factor;
 
     #[Pure] public function __construct()
     {
         $this->firewalls = new ArrayCollection();
         $this->motherboards = new ArrayCollection();
-        $this->m2s = new ArrayCollection();
+        $this->m2s_form_factor = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -136,25 +136,28 @@ class FormFactor
     /**
      * @return Collection<int, M2>
      */
-    public function getM2s(): Collection
+    public function getM2sFormFactor(): Collection
     {
-        return $this->m2s;
+        return $this->m2s_form_factor;
     }
 
-    public function addM2(M2 $m2): self
+    public function addM2sFormFactor(M2 $m2sFormFactor): self
     {
-        if (!$this->m2s->contains($m2)) {
-            $this->m2s[] = $m2;
-            $m2->addFormFactor($this);
+        if (!$this->m2s_form_factor->contains($m2sFormFactor)) {
+            $this->m2s_form_factor[] = $m2sFormFactor;
+            $m2sFormFactor->setFormFactor($this);
         }
 
         return $this;
     }
 
-    public function removeM2(M2 $m2): self
+    public function removeM2sFormFactor(M2 $m2sFormFactor): self
     {
-        if ($this->m2s->removeElement($m2)) {
-            $m2->removeFormFactor($this);
+        if ($this->m2s_form_factor->removeElement($m2sFormFactor)) {
+            // set the owning side to null (unless already changed)
+            if ($m2sFormFactor->getFormFactor() === $this) {
+                $m2sFormFactor->setFormFactor(null);
+            }
         }
 
         return $this;

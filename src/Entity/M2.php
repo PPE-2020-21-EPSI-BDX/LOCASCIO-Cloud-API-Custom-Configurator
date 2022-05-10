@@ -17,7 +17,10 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     collectionOperations: ['get'],
     itemOperations: [
         'get' => [
-            'normalization_context' => ['groups' => ['read:M2', 'read:FormFactor', 'read:MotherBoard']]
+            'normalization_context' => [
+                'groups' => ['read:M2', 'read:FormFactor', 'read:MotherBoard', 'read:Pcie'],
+                'enable_max_depth' => true
+            ]
         ]
     ]
 )]
@@ -31,11 +34,6 @@ class M2
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['read:M2'])]
     private string $name;
-
-    #[ORM\ManyToMany(targetEntity: FormFactor::class, inversedBy: 'm2s')]
-    #[Groups(['read:FormFactor'])]
-    #[MaxDepth(1)]
-    private FormFactor $form_factor;
 
     #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'm2')]
     #[Groups(['read:Motherboard'])]
@@ -61,14 +59,19 @@ class M2
     #[Groups(['read:M2'])]
     private ?Decimal $price;
 
-    #[ORM\ManyToOne(targetEntity: FormFactor::class, inversedBy: 'm2s')]
+    #[ORM\ManyToOne(targetEntity: PCIE::class)]
+    #[Groups(['read:Pcie'])]
+    #[MaxDepth(1)]
+    private ?PCIE $interface;
+
+    #[ORM\ManyToOne(targetEntity: FormFactor::class, inversedBy: 'm2s_form_factor')]
     #[Groups(['read:FormFactor'])]
     #[MaxDepth(1)]
-    private FormFactor $interface;
+    private ?FormFactor $form_factor;
+
 
     #[Pure] public function __construct()
     {
-        $this->form_factor = new FormFactor();
         $this->motherboards = new Motherboard();
     }
 
@@ -85,30 +88,6 @@ class M2
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return FormFactor
-     */
-    public function getFormFactor(): FormFactor
-    {
-        return $this->form_factor;
-    }
-
-    public function addFormFactor(FormFactor $formFactor): self
-    {
-        if (!$this->form_factor->contains($formFactor)) {
-            $this->form_factor[] = $formFactor;
-        }
-
-        return $this;
-    }
-
-    public function removeFormFactor(FormFactor $formFactor): self
-    {
-        $this->form_factor->removeElement($formFactor);
 
         return $this;
     }
@@ -188,14 +167,26 @@ class M2
         return $this;
     }
 
-    public function getInterface(): ?FormFactor
+    public function getInterface(): ?PCIE
     {
         return $this->interface;
     }
 
-    public function setInterface(?FormFactor $interface): self
+    public function setInterface(?PCIE $interface): self
     {
         $this->interface = $interface;
+
+        return $this;
+    }
+
+    public function getFormFactor(): ?FormFactor
+    {
+        return $this->form_factor;
+    }
+
+    public function setFormFactor(?FormFactor $form_factor): self
+    {
+        $this->form_factor = $form_factor;
 
         return $this;
     }

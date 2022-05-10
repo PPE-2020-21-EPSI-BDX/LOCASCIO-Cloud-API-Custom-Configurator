@@ -2,16 +2,27 @@
 
 namespace App\Tests;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-class FormFactorEndpointTest extends WebTestCase
+class FormFactorEndpointTest extends ParentTest
 {
-    public function testSomething(): void
+    /**
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    public function testGetAllElements(): void
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/');
+        $response = static::createClient()->request('GET', '/api/form_factors', [
+            'json' => 'application/ld+json; charset=utf-8'
+        ]);
+        $this->check_response($response);
+    }
 
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'Hello World');
+    /**
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    public function testGetOneElement(): void
+    {
+        $response = static::createClient()->request('GET', '/api/form_factors/1', [
+            'json' => 'application/ld+json; charset=utf-8'
+        ]);
+        $this->check_response($response);
     }
 }
