@@ -190,4 +190,16 @@ class M2
 
         return $this;
     }
+
+    public function getDelivery(): ?\DateTimeInterface
+    {
+        return $this->delivery;
+    }
+
+    public function setDelivery(?\DateTimeInterface $delivery): self
+    {
+        $this->delivery = $delivery;
+
+        return $this;
+    }
 }

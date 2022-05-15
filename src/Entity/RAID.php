@@ -291,4 +291,16 @@ class RAID
 
         return $this;
     }
+
+    public function getInterfaceSupport(): ?string
+    {
+        return $this->interface_support;
+    }
+
+    public function setInterfaceSupport(?string $interface_support): self
+    {
+        $this->interface_support = $interface_support;
+
+        return $this;
+    }
 }

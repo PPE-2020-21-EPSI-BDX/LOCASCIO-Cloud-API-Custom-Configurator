@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     itemOperations: [
         'get' => [
             'normalization_context' => [
-                'groups' => ['read:FormFactor'],
+                'groups' => ['read:FormFactor', 'read:Motherboard'],
                 'enable_max_depth' => true
             ]
         ],
@@ -39,21 +39,21 @@ class FormFactor
     #[MaxDepth(1)]
     private Collection $firewalls;
 
-    #[ORM\OneToMany(mappedBy: 'for_factor', targetEntity: Motherboard::class)]
-    #[Groups(['read:FormFactor'])]
-    #[MaxDepth(1)]
-    private Collection $motherboards;
-
     #[ORM\OneToMany(mappedBy: 'form_factor', targetEntity: M2::class)]
     #[Groups(['read:FormFactor'])]
     #[MaxDepth(1)]
     private Collection $m2s_form_factor;
 
+    #[ORM\OneToMany(mappedBy: 'form_factor', targetEntity: Motherboard::class)]
+    #[Groups(['read:Motherboard'])]
+    #[MaxDepth(1)]
+    private ArrayCollection $motherboards;
+
     #[Pure] public function __construct()
     {
         $this->firewalls = new ArrayCollection();
-        $this->motherboards = new ArrayCollection();
         $this->m2s_form_factor = new ArrayCollection();
+        $this->motherboards = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -104,36 +104,6 @@ class FormFactor
     }
 
     /**
-     * @return Collection<int, Motherboard>
-     */
-    public function getMotherboards(): Collection
-    {
-        return $this->motherboards;
-    }
-
-    public function addMotherboard(Motherboard $motherboard): self
-    {
-        if (!$this->motherboards->contains($motherboard)) {
-            $this->motherboards[] = $motherboard;
-            $motherboard->setForFactor($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMotherboard(Motherboard $motherboard): self
-    {
-        if ($this->motherboards->removeElement($motherboard)) {
-            // set the owning side to null (unless already changed)
-            if ($motherboard->getForFactor() === $this) {
-                $motherboard->setForFactor(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, M2>
      */
     public function getM2sFormFactor(): Collection
@@ -157,6 +127,36 @@ class FormFactor
             // set the owning side to null (unless already changed)
             if ($m2sFormFactor->getFormFactor() === $this) {
                 $m2sFormFactor->setFormFactor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Motherboard>
+     */
+    public function getMotherboards(): Collection
+    {
+        return $this->motherboards;
+    }
+
+    public function addMotherboard(Motherboard $motherboard): self
+    {
+        if (!$this->motherboards->contains($motherboard)) {
+            $this->motherboards[] = $motherboard;
+            $motherboard->setFormFactor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMotherboard(Motherboard $motherboard): self
+    {
+        if ($this->motherboards->removeElement($motherboard)) {
+            // set the owning side to null (unless already changed)
+            if ($motherboard->getFormFactor() === $this) {
+                $motherboard->setFormFactor(null);
             }
         }
 

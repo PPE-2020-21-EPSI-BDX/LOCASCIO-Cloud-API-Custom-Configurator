@@ -35,11 +35,6 @@ class Motherboard
     #[Groups(['read:Motherboard'])]
     private string $name;
 
-    #[ORM\ManyToOne(targetEntity: FormFactor::class, inversedBy: 'motherboards')]
-    #[Groups(['read:FormFactor'])]
-    #[MaxDepth(1)]
-    private Collection $form_factor;
-
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['read:Motherboard_detail'])]
     private ?string $dimension;
@@ -128,13 +123,15 @@ class Motherboard
     #[Groups(['read:Motherboard'])]
     private ArrayCollection $barebones;
 
+    #[ORM\ManyToOne(targetEntity: Formfactor::class, inversedBy: 'motherboards')]
+    private $form_factor;
+
     #[Pure] public function __construct()
     {
         $this->processors = new ArrayCollection();
         $this->mem_type = new ArrayCollection();
         $this->pci_e_support = new ArrayCollection();
         $this->m2 = new ArrayCollection();
-        $this->barbones = new ArrayCollection();
         $this->barebones = new ArrayCollection();
     }
 
@@ -151,18 +148,6 @@ class Motherboard
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getForFactor(): ?FormFactor
-    {
-        return $this->form_factor;
-    }
-
-    public function setForFactor(?FormFactor $form_factor): self
-    {
-        $this->form_factor = $form_factor;
 
         return $this;
     }
@@ -478,6 +463,18 @@ class Motherboard
         if ($this->barebones->removeElement($barebone)) {
             $barebone->removeMotherboard($this);
         }
+
+        return $this;
+    }
+
+    public function getFormFactor(): ?Formfactor
+    {
+        return $this->form_factor;
+    }
+
+    public function setFormFactor(?Formfactor $form_factor): self
+    {
+        $this->form_factor = $form_factor;
 
         return $this;
     }
