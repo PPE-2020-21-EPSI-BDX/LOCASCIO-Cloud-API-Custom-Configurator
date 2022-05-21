@@ -203,7 +203,6 @@ class Processor
      * Allows to get the date to delivery
      * @param Crawler $crawler
      * @return string|null
-     * @throws Exception
      * @throws \Exception
      */
     private function delivery(Crawler $crawler): ?string
@@ -468,7 +467,7 @@ class Processor
     {
         if ( $product->filter('div.basic-info > div.ean-number')->nextAll()->count() != 0 ){
             return $this->format->removeSpaces(
-                str_replace('Part Number : ', '', $product->filter('div.basic-info > div.ean-number')->nextAll()->text())
+                str_replace('Part number : ', '', $product->filter('div.basic-info > div.ean-number')->nextAll()->text())
             );
         }
         return null;
