@@ -123,8 +123,8 @@ class Motherboard
     #[Groups(['read:Motherboard'])]
     private ArrayCollection $barebones;
 
-    #[ORM\ManyToOne(targetEntity: Formfactor::class, inversedBy: 'motherboards')]
-    private $form_factor;
+    #[ORM\ManyToOne(targetEntity: FormFactor::class, inversedBy: 'motherboards')]
+    private ?Formfactor $form_factor;
 
     #[Pure] public function __construct()
     {

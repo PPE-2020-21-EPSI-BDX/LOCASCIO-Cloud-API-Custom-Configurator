@@ -9,12 +9,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
+use Symfony\Component\Serializer\Annotation\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 #[ORM\Entity(repositoryClass: ProcessorRepository::class)]
 #[ApiResource(
-    collectionOperations: ['get'],
+    collectionOperations: ['get', 'post'],
     itemOperations: [
         'get' => [
             'normalization_context' => [
@@ -39,13 +41,10 @@ class Processor
     #[Groups(['read:Processor'])]
     private ?string $brand;
 
-    #[ORM\Column(type: 'string', length: 10, nullable: true)]
-    #[Groups(['read:Processor'])]
-    private ?string $availability;
-
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['read:Processor'])]
-    private ?string $delivery;
+    #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
+    private ?\DateTime $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:Processor_detail'])]
@@ -95,14 +94,6 @@ class Processor
     #[Groups(['read:Processor_detail'])]
     private ?string $mem_type;
 
-    #[ORM\Column(type: 'boolean')]
-    #[Groups(['read:Processor_detail'])]
-    private bool $ecc;
-
-    #[ORM\Column(type: 'boolean')]
-    #[Groups(['read:Processor_detail'])]
-    private bool $graficsProcessor;
-
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:Processor_detail'])]
     private ?string $application;
@@ -110,14 +101,26 @@ class Processor
     #[ORM\Column(type: 'string', length: 255)]
     private string $url;
 
-    #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
-    #[Groups(['read:Processor'])]
-    private Decimal $price;
-
     #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'processors')]
     #[Groups(['read:Motherboard'])]
     #[MaxDepth(1)]
     private Collection $motherboards;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Groups(['read:Processor'])]
+    private ?float $price;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    #[Groups(['read:Processor_detail'])]
+    private ?bool $ecc;
+
+    #[ORM\Column(type: 'string', length: 25, nullable: true)]
+    #[Groups(['read:Processor'])]
+    private ?string $availability;
+
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    #[Groups(['read:Processor_detail'])]
+    private ?bool $graficsProcessor;
 
     #[Pure] public function __construct()
     {
@@ -149,18 +152,6 @@ class Processor
     public function setBrand(?string $brand): self
     {
         $this->brand = $brand;
-
-        return $this;
-    }
-
-    public function getAvailability(): ?string
-    {
-        return $this->availability;
-    }
-
-    public function setAvailability(?string $availability): self
-    {
-        $this->availability = $availability;
 
         return $this;
     }
@@ -321,30 +312,6 @@ class Processor
         return $this;
     }
 
-    public function getEcc(): bool
-    {
-        return $this->ecc;
-    }
-
-    public function setEcc(bool $ecc): self
-    {
-        $this->ecc = $ecc;
-
-        return $this;
-    }
-
-    public function getGraficsProcessor(): ?bool
-    {
-        return $this->graficsProcessor;
-    }
-
-    public function setGraficsProcessor(?bool $graficsProcessor): self
-    {
-        $this->graficsProcessor = $graficsProcessor;
-
-        return $this;
-    }
-
     public function getApplication(): ?string
     {
         return $this->application;
@@ -365,18 +332,6 @@ class Processor
     public function setUrl(string $url): self
     {
         $this->url = $url;
-
-        return $this;
-    }
-
-    public function getPrice(): ?string
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?string $price): self
-    {
-        $this->price = $price;
 
         return $this;
     }
@@ -404,6 +359,54 @@ class Processor
         if ($this->motherboards->removeElement($motherboard)) {
             $motherboard->removeProcessor($this);
         }
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?float $price): self
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function getEcc(): ?bool
+    {
+        return $this->ecc;
+    }
+
+    public function setEcc(?bool $ecc): self
+    {
+        $this->ecc = $ecc;
+
+        return $this;
+    }
+
+    public function getAvailability(): ?string
+    {
+        return $this->availability;
+    }
+
+    public function setAvailability(?string $availability): self
+    {
+        $this->availability = $availability;
+
+        return $this;
+    }
+
+    public function getGraficsProcessor(): ?bool
+    {
+        return $this->graficsProcessor;
+    }
+
+    public function setGraficsProcessor(?bool $graficsProcessor): self
+    {
+        $this->graficsProcessor = $graficsProcessor;
 
         return $this;
     }

@@ -3,6 +3,7 @@
 namespace App\Tests;
 
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client;
 
 class FirewallEndpointTest extends ParentTest
 {

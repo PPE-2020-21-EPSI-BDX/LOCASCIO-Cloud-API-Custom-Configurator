@@ -6,4 +6,4 @@ api_platform:
     swagger:
         versions: [ 3 ]
     eager_loading:
-        max_joins: 100
+        max_joins: 30
