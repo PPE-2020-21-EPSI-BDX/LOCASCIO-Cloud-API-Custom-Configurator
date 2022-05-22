@@ -8,10 +8,14 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 #[AsCommand(
     name: 'add-intel-processors',
-    description: 'Add processors to the Processor table.',
+    description: 'Add Intel processors to the Processor table.',
     hidden: false
 )]
 class AddIntelProcessor extends ParentCommand
@@ -29,10 +33,11 @@ class AddIntelProcessor extends ParentCommand
 
             for ($i = 1; $i < $nbrProductPage + 1; $i++) {
                 $processor->getInfo("https://www.senetic.fr/intel/intel_processors/?page=" . $i);
+                $processor->saveProcessor();
             }
 
             return Command::SUCCESS;
-        } catch (Exception $exception) {
+        } catch (Exception|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $exception) {
             $this->display_error($exception);
             return Command::FAILURE;
         }
