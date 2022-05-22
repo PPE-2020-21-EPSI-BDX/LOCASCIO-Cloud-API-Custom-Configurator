@@ -10,11 +10,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
-    name: 'add-intel-processors',
-    description: 'Add processors to the Processor table.',
+    name: 'add-amd-processors',
+    description: 'Add AMD processors to the Processor table.',
     hidden: false
 )]
-class AddIntelProcessor extends ParentCommand
+class AddAmdProcessor extends ParentCommand
 {
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -25,10 +25,10 @@ class AddIntelProcessor extends ParentCommand
 
             $processor = new SenecticProcessor();
 
-            $nbrProductPage = $processor->getNumberPage("https://www.senetic.fr/intel/intel_processors/");
+            $nbrProductPage = $processor->getNumberPage("https://www.senetic.fr/amd/");
 
             for ($i = 1; $i < $nbrProductPage + 1; $i++) {
-                $processor->getInfo("https://www.senetic.fr/intel/intel_processors/?page=" . $i);
+                $processor->getInfo("https://www.senetic.fr/amd/?page=" . $i);
             }
 
             return Command::SUCCESS;

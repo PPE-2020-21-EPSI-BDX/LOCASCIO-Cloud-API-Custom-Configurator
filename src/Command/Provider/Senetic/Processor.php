@@ -13,7 +13,6 @@ class Processor
 {
 
     private HttpBrowser $browser;
-    protected ?String $brand;
 
     protected String $urlProduct;
     protected Format $format;
@@ -50,12 +49,10 @@ class Processor
     /**
      * Allow to search data for a specif url
      * @param String $url
-     * @param String $brand
      * @return void
      */
-    public function getInfo(String $url, String $brand): void
+    public function getInfo(String $url): void
     {
-        $this->brand = $brand;
         $this->findURLProduct($url);
     }
 
@@ -124,7 +121,7 @@ class Processor
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => [
               "name" => $this->getName($product),
-              "brand" => $this->brand,
+              "brand" => $this->getBrand($product),
               "availability" => $this->availability($product),
               "delivery" => $this->delivery($product),
               "socket" => $this->socket(),
@@ -152,9 +149,9 @@ class Processor
             dd($response->getContent());
         }
 
-        dump('');
+        dump('===========================================================');
         dump('Insert ' . $this->getName($product). ' in DB with success !');
-        dump('');
+        dump('===========================================================');
     }
 
     /**
@@ -170,6 +167,16 @@ class Processor
             );
         }
         throw new \TypeError('The product name cannot be null');
+    }
+
+    /**
+     * Allows to give the brand name
+     * @param Crawler $product
+     * @return string
+     */
+    private function getBrand(Crawler $product) :string
+    {
+        return $product->filter('div.vendor-logo > meta')->attr('content');
     }
 
     /**
@@ -363,7 +370,9 @@ class Processor
     private function maxMemSpeed(): ?string
     {
         if( isset($this->tempSpecs["Vitesses d'horloge de mémoire prises en charge par le processeur"]) ){
-            return $this->format->removeSpaces($this->tempSpecs["Vitesses d'horloge de mémoire prises en charge par le processeur"]);
+            $element = $this->tempSpecs["Vitesses d'horloge de mémoire prises en charge par le processeur"];
+            $explode = explode(',', $element);
+            return (count($explode) > 1) ? $this->format->removeSpaces(end($explode)) : $element;
         }
         return null;
     }
