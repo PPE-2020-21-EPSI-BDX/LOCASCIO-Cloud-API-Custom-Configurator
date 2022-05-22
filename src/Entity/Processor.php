@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\ProcessorRepository;
-use Decimal\Decimal;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,8 +27,10 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
                 'enable_max_depth' => true
             ]
         ]
-    ]
+    ],
+    paginationItemsPerPage: 2,
 )]
+#[ApiFilter(SearchFilter::class, properties: ['provider_reference' => 'exact'])]
 class Processor
 {
     #[ORM\Id]
@@ -44,7 +49,7 @@ class Processor
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['read:Processor'])]
     #[Context([DateTimeNormalizer::FORMAT_KEY => 'Y-m-d'])]
-    private ?\DateTime $delivery;
+    private ?DateTime $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:Processor_detail'])]
@@ -156,12 +161,12 @@ class Processor
         return $this;
     }
 
-    public function getDelivery(): ?\DateTimeInterface
+    public function getDelivery(): ?DateTimeInterface
     {
         return $this->delivery;
     }
 
-    public function setDelivery(?\DateTimeInterface $delivery): self
+    public function setDelivery(?DateTimeInterface $delivery): self
     {
         $this->delivery = $delivery;
 

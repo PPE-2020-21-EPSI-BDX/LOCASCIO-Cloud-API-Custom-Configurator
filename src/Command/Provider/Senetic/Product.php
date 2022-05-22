@@ -9,15 +9,21 @@ use Exception;
 use Symfony\Component\BrowserKit\HttpBrowser;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use TypeError;
 
 class Product
 {
     protected HttpBrowser $browser;
 
+    protected Format $format;
+
     protected string $urlProduct;
     protected array $detail;
-    protected array $specProduct;
     private array $specLabel;
     private array $specValue;
 
@@ -31,7 +37,6 @@ class Product
         $this->specLabel = [];
         $this->specValue = [];
         $this->detail = [];
-        $this->specProduct = [];
     }
 
     /**
@@ -53,6 +58,7 @@ class Product
      * Allow to search data for a specif url
      * @param String $url
      * @return void
+     * @throws Exception
      */
     public function getInfo(string $url): void
     {
@@ -61,6 +67,7 @@ class Product
 
     /**
      * Allows to capture the url of a product
+     * @throws Exception
      */
     protected function findURLProduct(string $url): void
     {
@@ -75,6 +82,7 @@ class Product
 
     /**
      * Allows to format a product for the DB
+     * @throws Exception
      */
     protected function getSpecProduct(): void
     {
@@ -82,8 +90,7 @@ class Product
 
         $crawler->filter('div.product-content')->each(closure: function ($product) {
             $this->generateTempSpec($product);
-            $this->specProduct[] = $product;
-            //$this->saveProcessor($product);
+            $this->saveProduct($product);
         });
     }
 
@@ -100,7 +107,7 @@ class Product
 
         $product->filter('td.spec-value')->each(function ($element) {
             if ($element->count() != 0) {
-                array_push($this->specValue, $element->text());
+                $this->specValue[] = $element->text();
             }
         });
 
@@ -108,6 +115,38 @@ class Product
 
         $this->specLabel = [];
         $this->specValue = [];
+    }
+
+    /**
+     * Allows to send data to the API endpoint
+     * @throws Exception
+     */
+    protected function saveProduct(Crawler $product): void
+    {
+        throw new Exception('Not Implemented Method');
+    }
+
+    /**
+     * Allows to check whether a product already exists in the database
+     * @param String $url
+     * @return bool
+     * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    protected function checkExist(string $url): bool
+    {
+        $httpClient = HttpClient::create();
+
+        $response = $httpClient->request('GET', $url, [
+            'headers' => ['Content-Type' => 'application/ld+json']
+        ]);
+
+        $data = $response->toArray();
+
+        return !(($data['hydra:totalItems'] > 0));
     }
 
     /**

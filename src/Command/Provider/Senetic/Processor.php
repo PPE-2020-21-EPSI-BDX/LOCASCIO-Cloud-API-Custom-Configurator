@@ -2,37 +2,44 @@
 
 namespace App\Command\Provider\Senetic;
 
-use App\Command\Provider\Format;
 use Exception;
+use stdClass;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class Processor extends Product
 {
-    protected Format $format;
+    public Stdclass $result;
 
     public function __construct()
     {
         parent::__construct();
+        $this->result = new stdClass();
+        $this->result->status = '';
+        $this->result->msg = '';
     }
 
     /**
      * Allows to save Processor in DB
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
      * @throws Exception
      */
-    public function saveProcessor(): void
+    protected function saveProduct(Crawler $product): void
     {
-        foreach ($this->specProduct as $product) {
+        if ($this->checkExist($_SERVER['APP_HOST'] . '/api/processors?provider_reference=' . $this->providerReference($product))) {
+
             $httpClient = HttpClient::create();
 
-            $response = $httpClient->request('POST', 'http://127.0.0.1/api/processors', [
+            $response = $httpClient->request('POST', $_SERVER['APP_HOST'] . '/api/processors', [
                 'headers' => ['Content-Type' => 'application/ld+json'],
                 'json' => [
                     "name" => $this->getName($product),
@@ -60,13 +67,17 @@ class Processor extends Product
             ]);
 
             if ($response->getStatusCode() != 201) {
-                dump('Error with the saveProcessor Method');
+                dump('Error with the Senectic\Processor\saveProduct Method');
                 dd($response->getContent());
             }
 
-            dump('===========================================================');
-            dump('Insert ' . $this->getName($product) . ' in DB with success !');
-            dump('===========================================================');
+            dump("==========================================================================================");
+            dump('    SUCCESS - Insert ' . $this->getName($product) . ' in DB !');
+            dump("==========================================================================================");
+        } else {
+            dump("==========================================================================================");
+            dump('    WARNING - The ' . $this->getName($product) . ' product already exist in DB !');
+            dump("==========================================================================================");
         }
     }
 

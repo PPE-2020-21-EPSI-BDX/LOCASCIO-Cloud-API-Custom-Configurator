@@ -11,7 +11,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 #[AsCommand(
     name: 'add-amd-processors',
@@ -28,16 +27,16 @@ class AddAmdProcessor extends ParentCommand
             $this->start();
 
             $processor = new SenecticProcessor();
-
             $nbrProductPage = $processor->getNumberPage("https://www.senetic.fr/amd/");
+            unset($processor);
 
             for ($i = 1; $i < $nbrProductPage + 1; $i++) {
+                $processor = new SenecticProcessor();
                 $processor->getInfo("https://www.senetic.fr/amd/?page=" . $i);
-                $processor->saveProcessor();
+                unset($processor);
             }
-
             return Command::SUCCESS;
-        } catch (Exception|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface $exception) {
+        } catch (Exception|ClientExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface $exception) {
             $this->display_error($exception);
             return Command::FAILURE;
         }
