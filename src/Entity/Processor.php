@@ -26,9 +26,11 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
                 'groups' => ['read:Processor', 'read:Processor_detail', 'read:Motherboard'],
                 'enable_max_depth' => true
             ]
-        ]
+        ],
+        'patch' => []
     ],
     paginationItemsPerPage: 2,
+    paginationMaximumItemsPerPage: 2
 )]
 #[ApiFilter(SearchFilter::class, properties: ['provider_reference' => 'exact'])]
 class Processor
@@ -119,13 +121,13 @@ class Processor
     #[Groups(['read:Processor_detail'])]
     private ?bool $ecc;
 
-    #[ORM\Column(type: 'string', length: 25, nullable: true)]
-    #[Groups(['read:Processor'])]
-    private ?string $availability;
-
     #[ORM\Column(type: 'boolean', nullable: true)]
     #[Groups(['read:Processor_detail'])]
     private ?bool $graficsProcessor;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['read:Processor'])]
+    private ?int $availability;
 
     #[Pure] public function __construct()
     {
@@ -392,18 +394,6 @@ class Processor
         return $this;
     }
 
-    public function getAvailability(): ?string
-    {
-        return $this->availability;
-    }
-
-    public function setAvailability(?string $availability): self
-    {
-        $this->availability = $availability;
-
-        return $this;
-    }
-
     public function getGraficsProcessor(): ?bool
     {
         return $this->graficsProcessor;
@@ -412,6 +402,18 @@ class Processor
     public function setGraficsProcessor(?bool $graficsProcessor): self
     {
         $this->graficsProcessor = $graficsProcessor;
+
+        return $this;
+    }
+
+    public function getAvailability(): ?int
+    {
+        return $this->availability;
+    }
+
+    public function setAvailability(?int $availability): self
+    {
+        $this->availability = $availability;
 
         return $this;
     }

@@ -2,6 +2,8 @@
 
 namespace App\Command\Provider;
 
+use Exception;
+
 class Format
 {
 
@@ -61,7 +63,7 @@ class Format
             $string = $this->removeAccents($string);
             $arr1 = preg_split('/[^a-zA-Z_0-9().,-]+/', $string);
 
-            foreach ($arr1 as $element){
+            foreach ($arr1 as $element) {
                 (preg_match('/[a-zA-Z_0-9().,-]+/', $element) == 1) ? array_push($temp, $element) : false;
             }
 
@@ -72,11 +74,22 @@ class Format
     }
 
     /**
+     * Allows to return the product availability in int
+     * @param string $availability
+     * @return int
+     */
+    public function convertAvaiability(string $availability): int
+    {
+        $new_val = explode(' ', $this->removeSpaces($availability))[0];
+        return (str_contains($new_val, '-')) ? intval(explode('-', $new_val)[0]) : intval($new_val);
+    }
+
+    /**
      * Allows to convert an accent into a letter
      * @param String $word
      * @return array|string
      */
-    private function removeAccents(String $word): array|string
+    private function removeAccents(string $word): array|string
     {
         $word = str_replace('à', 'a', $word);
         $word = str_replace('â', 'a', $word);
@@ -145,10 +158,24 @@ class Format
             'dimanche' => 'sunday'
         ];
 
-        if(isset($temp[$day])){
+        if (isset($temp[$day])) {
             return $temp[$day];
-        }else{
-            throw new Exception('No day found: '. $day);
+        } else {
+            throw new Exception('No day found: ' . $day);
         }
+    }
+
+    /**
+     * Allows to convert an out-of-stock string to int
+     * @param string $word
+     * @return null
+     * @throws Exception
+     */
+    public function convertOutOfStock(string $word)
+    {
+        if ($word == 'En rupture de stock') {
+            return null;
+        }
+        throw new Exception('Error with Format\convertOutOfStock method');
     }
 }

@@ -59,7 +59,7 @@ class Processor extends Product
                     "application" => $this->application(),
                     "url" => $this->url(),
                     "price" => $this->price($product),
-                    "providerReference" => $this->providerReference($product),
+                    "provider_reference" => $this->providerReference($product),
                     "maxMemCapacity" => $this->maxMemCapacity(),
                     "maxMemSpeed" => $this->maxMemSpeed(),
                     "memType" => $this->memType()
@@ -75,9 +75,9 @@ class Processor extends Product
             dump('    SUCCESS - Insert ' . $this->getName($product) . ' in DB !');
             dump("==========================================================================================");
         } else {
-            dump("==========================================================================================");
-            dump('    WARNING - The ' . $this->getName($product) . ' product already exist in DB !');
-            dump("==========================================================================================");
+
+            $this->update($product);
+
         }
     }
 

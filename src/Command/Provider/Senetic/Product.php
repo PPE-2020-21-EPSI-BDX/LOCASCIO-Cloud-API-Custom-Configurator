@@ -3,9 +3,12 @@
 namespace App\Command\Provider\Senetic;
 
 use App\Command\Provider\Format;
+use ArrayObject;
+use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
+use stdClass;
 use Symfony\Component\BrowserKit\HttpBrowser;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpClient\HttpClient;
@@ -26,6 +29,7 @@ class Product
     protected array $detail;
     private array $specLabel;
     private array $specValue;
+    private array $oldProduct;
 
     protected function __construct()
     {
@@ -37,6 +41,7 @@ class Product
         $this->specLabel = [];
         $this->specValue = [];
         $this->detail = [];
+        $this->oldProduct = [];
     }
 
     /**
@@ -146,7 +151,81 @@ class Product
 
         $data = $response->toArray();
 
+        $this->oldProduct = ($data['hydra:totalItems'] > 0) ? $data['hydra:member'][0] : [];
+
         return !(($data['hydra:totalItems'] > 0));
+    }
+
+    /**
+     * Allows to update the delivery, price an availability of products in DB
+     * @throws Exception
+     * @throws TransportExceptionInterface
+     */
+    protected function update(Crawler $product): bool
+    {
+        $temp = new stdclass;
+
+        $new_date = new DateTime($this->delivery($product));
+        $new_price = floatval($this->price($product));
+        $new_availability = intval($this->availability($product));
+
+        if (isset($this->oldProduct['delivery'])) {
+            $old_date = new DateTime($this->oldProduct['delivery']);
+            $temp->delivery = ($new_date > $old_date) ? $new_date->format('Y-m-d') : (($old_date > $new_date) ? $old_date->format('Y-m-d') : null);
+        } else {
+            $temp->delivery = $new_date->format('Y-m-d');
+        }
+
+        if (isset($this->oldProduct['price'])) {
+            $old_price = floatval($this->oldProduct['price']);
+            $temp->price = ($new_price > $old_price) ? $new_price : (($old_price > $new_price) ? $old_price : null);
+        } else {
+            $temp->price = $new_price;
+        }
+
+        if (isset($this->oldProduct['availability'])) {
+            $old_availability = intval($this->oldProduct['availability']);
+            $temp->availability = ($new_availability > $old_availability) ? $new_availability : (($old_availability > $new_availability) ? $old_availability : null);
+        } else {
+            $temp->availability = $new_availability;
+        }
+
+        $update_field = "";
+
+        foreach (get_object_vars($temp) as $key => $value) {
+            $array_keys = array_keys(get_object_vars($temp));
+            $last_key = end($array_keys);
+
+            if (is_null($value)) {
+                unset($temp->$key);
+            }
+
+            $update_field .= ($key == $last_key) ? ' ' . $key : ' ' . $key . ',';
+        }
+
+        if ((new ArrayObject($temp))->count() > 0) {
+
+            $httpClient = HttpClient::create();
+
+            $response = $httpClient->request('PATCH', $_SERVER['APP_HOST'] . '/api/processors/' . $this->oldProduct['id'], [
+                'headers' => ['accept' => 'application/ld+json', 'Content-Type' => 'application/merge-patch+json'],
+                'json' => $temp,
+            ]);
+
+            if ($response->getStatusCode() != 200) {
+                dump('Error with the Senectic\Product\update Method');
+                dd($response->getContent());
+            }
+            dump("============================================================================================================================================");
+            dump('    SUCCESS - UPDATE The' . $update_field . ' field(s) of the product ' . $this->getName($product) . ' in DB !');
+            dump("============================================================================================================================================");
+            return true;
+        } else {
+            dump("============================================================================================================================================");
+            dump('    WARNING - All fields of the ' . $this->getName($product) . ' are already updated in DB !');
+            dump("============================================================================================================================================");
+            return false;
+        }
     }
 
     /**
@@ -178,12 +257,13 @@ class Product
      * Allows to give the availability
      * @param Crawler $crawler
      * @return string|null
+     * @throws Exception
      */
     protected function availability(Crawler $crawler): ?string
     {
 
         if ($crawler->filter('div.stock-info > div.data')->count() != 0) {
-            return $this->format->removeSpaces($crawler->filter('div.stock-info > div.data')->text());
+            return $this->format->convertAvaiability($crawler->filter('div.stock-info > div.data')->text());
         }
         return $this->checkOutOfStock($crawler);
     }
@@ -192,11 +272,12 @@ class Product
      * Allows checking if it out of stock
      * @param Crawler $crawler
      * @return string|null
+     * @throws Exception
      */
     protected function checkOutOfStock(Crawler $crawler): ?string
     {
         if ($crawler->filter('div.warehouse-box > div.full-width')->count() != 0) {
-            return $crawler->filter('div.warehouse-box > div.full-width')->text();
+            return $this->format->convertOutOfStock($crawler->filter('div.warehouse-box > div.full-width')->text());
         }
         return null;
     }
