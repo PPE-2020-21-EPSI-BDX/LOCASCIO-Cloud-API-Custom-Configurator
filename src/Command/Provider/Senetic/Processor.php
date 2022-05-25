@@ -3,7 +3,6 @@
 namespace App\Command\Provider\Senetic;
 
 use Exception;
-use stdClass;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -14,14 +13,10 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class Processor extends Product
 {
-    public Stdclass $result;
 
     public function __construct()
     {
         parent::__construct();
-        $this->result = new stdClass();
-        $this->result->status = '';
-        $this->result->msg = '';
     }
 
     /**
