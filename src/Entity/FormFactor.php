@@ -34,20 +34,19 @@ class FormFactor
     #[Groups(['read:FormFactor'])]
     private ?string $name;
 
-    #[ORM\OneToMany(mappedBy: 'form_factor', targetEntity: M2::class)]
-    #[Groups(['read:FormFactor'])]
-    #[MaxDepth(1)]
-    private Collection $m2s_form_factor;
-
     #[ORM\OneToMany(mappedBy: 'form_factor', targetEntity: Motherboard::class)]
     #[Groups(['read:Motherboard'])]
     #[MaxDepth(1)]
     private ArrayCollection $motherboards;
 
+    #[ORM\OneToMany(mappedBy: 'form_factor', targetEntity: Disk::class, orphanRemoval: true)]
+    #[MaxDepth(1)]
+    private ArrayCollection $disks;
+
     #[Pure] public function __construct()
     {
-        $this->m2s_form_factor = new ArrayCollection();
         $this->motherboards = new ArrayCollection();
+        $this->disks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -63,36 +62,6 @@ class FormFactor
     public function setName(?string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, M2>
-     */
-    public function getM2sFormFactor(): Collection
-    {
-        return $this->m2s_form_factor;
-    }
-
-    public function addM2sFormFactor(M2 $m2sFormFactor): self
-    {
-        if (!$this->m2s_form_factor->contains($m2sFormFactor)) {
-            $this->m2s_form_factor[] = $m2sFormFactor;
-            $m2sFormFactor->setFormFactor($this);
-        }
-
-        return $this;
-    }
-
-    public function removeM2sFormFactor(M2 $m2sFormFactor): self
-    {
-        if ($this->m2s_form_factor->removeElement($m2sFormFactor)) {
-            // set the owning side to null (unless already changed)
-            if ($m2sFormFactor->getFormFactor() === $this) {
-                $m2sFormFactor->setFormFactor(null);
-            }
-        }
 
         return $this;
     }
@@ -121,6 +90,36 @@ class FormFactor
             // set the owning side to null (unless already changed)
             if ($motherboard->getFormFactor() === $this) {
                 $motherboard->setFormFactor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Disk>
+     */
+    public function getDisks(): Collection
+    {
+        return $this->disks;
+    }
+
+    public function addDisk(Disk $disk): self
+    {
+        if (!$this->disks->contains($disk)) {
+            $this->disks[] = $disk;
+            $disk->setFormFactor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDisk(Disk $disk): self
+    {
+        if ($this->disks->removeElement($disk)) {
+            // set the owning side to null (unless already changed)
+            if ($disk->getFormFactor() === $this) {
+                $disk->setFormFactor(null);
             }
         }
 

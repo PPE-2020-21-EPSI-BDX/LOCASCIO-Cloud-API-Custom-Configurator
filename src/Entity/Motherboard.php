@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     itemOperations: [
         'get' => [
             'normalization_context' => [
-                'groups' => ['read:Motherboard', 'read:FormFactor', 'read:Motherboard_detail', 'read:Processor', 'read:Memory'],
+                'groups' => ['read:Motherboard', 'read:FormFactor', 'read:Motherboard_detail', 'read:Processor', 'read:Memory', 'read:Connector'],
                 'enable_max_depth' => true
             ]
         ]
@@ -85,16 +85,6 @@ class Motherboard
     #[Groups(['read:Motherboard_detail'])]
     private ?string $tpm;
 
-    #[ORM\ManyToMany(targetEntity: PCIE::class, inversedBy: 'motherboards')]
-    #[Groups(['read:Motherboard_detail'])]
-    #[MaxDepth(1)]
-    private Collection $pci_e_support;
-
-    #[ORM\ManyToMany(targetEntity: M2::class, inversedBy: 'motherboards')]
-    #[Groups(['read:Motherboard'])]
-    #[MaxDepth(1)]
-    private Collection $m2;
-
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
     #[Groups(['read:Motherboard'])]
     private ?string $availability;
@@ -126,13 +116,17 @@ class Motherboard
     #[Groups(['read:Motherboard'])]
     private ?float $price;
 
+    #[ORM\ManyToMany(targetEntity: Connector::class, inversedBy: 'motherboards')]
+    #[Groups(['read:Connector'])]
+    #[MaxDepth(1)]
+    private ArrayCollection $interface;
+
     #[Pure] public function __construct()
     {
         $this->processors = new ArrayCollection();
-        $this->pci_e_support = new ArrayCollection();
-        $this->m2 = new ArrayCollection();
         $this->barebones = new ArrayCollection();
         $this->memories = new ArrayCollection();
+        $this->interface = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -308,54 +302,6 @@ class Motherboard
         return $this;
     }
 
-    /**
-     * @return Collection<int, PCIE>
-     */
-    public function getPciESupport(): Collection
-    {
-        return $this->pci_e_support;
-    }
-
-    public function addPciESupport(PCIE $pciESupport): self
-    {
-        if (!$this->pci_e_support->contains($pciESupport)) {
-            $this->pci_e_support[] = $pciESupport;
-        }
-
-        return $this;
-    }
-
-    public function removePciESupport(PCIE $pciESupport): self
-    {
-        $this->pci_e_support->removeElement($pciESupport);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, M2>
-     */
-    public function getM2(): Collection
-    {
-        return $this->m2;
-    }
-
-    public function addM2(M2 $m2): self
-    {
-        if (!$this->m2->contains($m2)) {
-            $this->m2[] = $m2;
-        }
-
-        return $this;
-    }
-
-    public function removeM2(M2 $m2): self
-    {
-        $this->m2->removeElement($m2);
-
-        return $this;
-    }
-
     public function getAvailability(): ?string
     {
         return $this->availability;
@@ -478,6 +424,30 @@ class Motherboard
     public function setPrice(?float $price): self
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Connector>
+     */
+    public function getInterface(): Collection
+    {
+        return $this->interface;
+    }
+
+    public function addInterface(Connector $interface): self
+    {
+        if (!$this->interface->contains($interface)) {
+            $this->interface[] = $interface;
+        }
+
+        return $this;
+    }
+
+    public function removeInterface(Connector $interface): self
+    {
+        $this->interface->removeElement($interface);
 
         return $this;
     }

@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     itemOperations: [
         'get' => [
             'normalization_context' => [
-                'groups' => ['read:Motherboard', 'read:FormFactor', 'read:Motherboard_detail', 'read:Processor', 'read:Memory'],
+                'groups' => ['read:Motherboard', 'read:FormFactor', 'read:Motherboard_detail', 'read:Processor', 'read:Memory', 'read:Connector'],
                 'enable_max_depth' => true
             ]
         ]
@@ -60,11 +60,6 @@ class RAID
     #[MaxDepth(1)]
     private Collection $motherboards;
 
-    #[ORM\ManyToOne(targetEntity: PCIE::class, inversedBy: 'raids')]
-    #[Groups(['read:PCIE'])]
-    #[MaxDepth(1)]
-    private Collection $pcie;
-
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
     #[Groups(['read:Raid'])]
     private ?string $availability;
@@ -83,6 +78,12 @@ class RAID
     #[ORM\Column(type: 'float', nullable: true)]
     #[Groups(['read:Raid'])]
     private ?float $price;
+
+    #[ORM\ManyToOne(targetEntity: Connector::class, inversedBy: 'raid_cards')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:Connector'])]
+    #[MaxDepth(1)]
+    private Connector $connector;
 
     #[Pure] public function __construct()
     {
@@ -142,30 +143,6 @@ class RAID
         return $this;
     }
 
-    public function getPciExpressSlotVersion(): ?string
-    {
-        return $this->pci_express_slot_version;
-    }
-
-    public function setPciExpressSlotVersion(?string $pci_express_slot_version): self
-    {
-        $this->pci_express_slot_version = $pci_express_slot_version;
-
-        return $this;
-    }
-
-    public function getHostInterface(): ?string
-    {
-        return $this->host_interface;
-    }
-
-    public function setHostInterface(?string $host_interface): self
-    {
-        $this->host_interface = $host_interface;
-
-        return $this;
-    }
-
     public function getNbrPortSas(): ?int
     {
         return $this->nbr_port_sas;
@@ -216,18 +193,6 @@ class RAID
                 $motherboard->setRaidSupport(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getPcie(): ?PCIE
-    {
-        return $this->pcie;
-    }
-
-    public function setPcie(?PCIE $pcie): self
-    {
-        $this->pcie = $pcie;
 
         return $this;
     }
@@ -300,6 +265,18 @@ class RAID
     public function setPrice(?float $price): self
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    public function getConnector(): ?Connector
+    {
+        return $this->connector;
+    }
+
+    public function setConnector(?Connector $connector): self
+    {
+        $this->connector = $connector;
 
         return $this;
     }
