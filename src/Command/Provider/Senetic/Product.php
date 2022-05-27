@@ -367,4 +367,16 @@ class Product
         }
         return null;
     }
+
+    /**
+     * Allows identifying what's it for
+     * @return string|null
+     */
+    protected function application(): ?string
+    {
+        if (isset($this->detail['composant pour'])) {
+            return $this->format->removeSpaces($this->detail['composant pour']);
+        }
+        return null;
+    }
 }

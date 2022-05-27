@@ -2,28 +2,30 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\MemoryRepository;
-use Decimal\Decimal;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: MemoryRepository::class)]
 #[ApiResource(
-    collectionOperations: ['get'],
+    collectionOperations: ['get', 'post'],
     itemOperations: [
         'get' => [
             'normalization_context' => [
                 'groups' => ['read:Memory', 'read:Motherboard', 'read:Memory_detail'],
                 'enable_max_depth' => true
             ]
-        ]
+        ],
+        'patch' => []
     ]
 )]
+#[ApiFilter(SearchFilter::class, properties: ['provider_reference' => 'exact'])]
 class Memory
 {
     #[ORM\Id]
@@ -45,11 +47,7 @@ class Memory
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['read:Memory'])]
-    private ?\DateTimeInterface $delivery;
-
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read:Memory_detail'])]
-    private ?string $provider_reference;
+    private ?DateTimeInterface $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:Memory'])]
@@ -82,18 +80,23 @@ class Memory
     #[ORM\Column(type: 'string', length: 255)]
     private string $url;
 
-    #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
+    #[ORM\Column(type: 'float', nullable: true)]
     #[Groups(['read:Memory'])]
-    private Decimal $price;
+    private ?float $price;
 
-    #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'mem_type')]
-    #[Groups(['read:Motherboard'])]
-    #[MaxDepth(1)]
-    private Motherboard $motherboards;
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    #[Groups(['read:Memory'])]
+    private ?string $slot_type;
 
-    #[Pure] public function __construct()
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    private $provider_reference;
+
+    #[ORM\ManyToMany(targetEntity: Motherboard::class, inversedBy: 'memories')]
+    private $motherboards;
+
+    public function __construct()
     {
-        $this->motherboards = new Motherboard();
+        $this->motherboards = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -137,26 +140,14 @@ class Memory
         return $this;
     }
 
-    public function getDelivery(): ?\DateTimeInterface
+    public function getDelivery(): ?DateTimeInterface
     {
         return $this->delivery;
     }
 
-    public function setDelivery(?\DateTimeInterface $delivery): self
+    public function setDelivery(?DateTimeInterface $delivery): self
     {
         $this->delivery = $delivery;
-
-        return $this;
-    }
-
-    public function getProviderReference(): ?string
-    {
-        return $this->provider_reference;
-    }
-
-    public function setProviderReference(?string $provider_reference): self
-    {
-        $this->provider_reference = $provider_reference;
 
         return $this;
     }
@@ -257,14 +248,38 @@ class Memory
         return $this;
     }
 
-    public function getPrice(): ?decimal
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice(?decimal $price): self
+    public function setPrice(?float $price): self
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    public function getSlotType(): ?string
+    {
+        return $this->slot_type;
+    }
+
+    public function setSlotType(?string $slot_type): self
+    {
+        $this->slot_type = $slot_type;
+
+        return $this;
+    }
+
+    public function getProviderReference(): ?string
+    {
+        return $this->provider_reference;
+    }
+
+    public function setProviderReference(?string $provider_reference): self
+    {
+        $this->provider_reference = $provider_reference;
 
         return $this;
     }
@@ -281,7 +296,6 @@ class Memory
     {
         if (!$this->motherboards->contains($motherboard)) {
             $this->motherboards[] = $motherboard;
-            $motherboard->addMemType($this);
         }
 
         return $this;
@@ -289,9 +303,7 @@ class Memory
 
     public function removeMotherboard(Motherboard $motherboard): self
     {
-        if ($this->motherboards->removeElement($motherboard)) {
-            $motherboard->removeMemType($this);
-        }
+        $this->motherboards->removeElement($motherboard);
 
         return $this;
     }

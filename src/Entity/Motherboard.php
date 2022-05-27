@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\MotherboardRepository;
+use DateTimeInterface;
 use Decimal\Decimal;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -51,11 +52,6 @@ class Motherboard
     #[ORM\Column(type: 'integer')]
     #[Groups(['read:Motherboard_detail'])]
     private int $mem_slots;
-
-    #[ORM\ManyToMany(targetEntity: Memory::class, inversedBy: 'motherboards')]
-    #[Groups(['read:Memory'])]
-    #[MaxDepth(1)]
-    private Collection $mem_type;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['read:Motherboard'])]
@@ -106,7 +102,7 @@ class Motherboard
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['read:Motherboard'])]
-    private ?\DateTimeInterface $delivery;
+    private ?DateTimeInterface $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:Motherboard_detail'])]
@@ -126,13 +122,18 @@ class Motherboard
     #[ORM\ManyToOne(targetEntity: FormFactor::class, inversedBy: 'motherboards')]
     private ?Formfactor $form_factor;
 
+    #[ORM\ManyToMany(targetEntity: Memory::class, mappedBy: 'motherboards')]
+    #[Groups(['read:Memory'])]
+    #[MaxDepth(1)]
+    private ArrayCollection $memories;
+
     #[Pure] public function __construct()
     {
         $this->processors = new ArrayCollection();
-        $this->mem_type = new ArrayCollection();
         $this->pci_e_support = new ArrayCollection();
         $this->m2 = new ArrayCollection();
         $this->barebones = new ArrayCollection();
+        $this->memories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -212,30 +213,6 @@ class Motherboard
         return $this;
     }
 
-    /**
-     * @return Collection<int, Memory>
-     */
-    public function getMemType(): Collection
-    {
-        return $this->mem_type;
-    }
-
-    public function addMemType(Memory $memType): self
-    {
-        if (!$this->mem_type->contains($memType)) {
-            $this->mem_type[] = $memType;
-        }
-
-        return $this;
-    }
-
-    public function removeMemType(Memory $memType): self
-    {
-        $this->mem_type->removeElement($memType);
-
-        return $this;
-    }
-
     public function getNbrMaxSata(): ?int
     {
         return $this->nbr_max_sata;
@@ -248,7 +225,7 @@ class Motherboard
         return $this;
     }
 
-    public function getRaidSupport(): ?RAID
+    public function getRaidSupport(): Collection
     {
         return $this->raid_support;
     }
@@ -392,12 +369,12 @@ class Motherboard
         return $this;
     }
 
-    public function getDelivery(): ?\DateTimeInterface
+    public function getDelivery(): ?DateTimeInterface
     {
         return $this->delivery;
     }
 
-    public function setDelivery(?\DateTimeInterface $delivery): self
+    public function setDelivery(?DateTimeInterface $delivery): self
     {
         $this->delivery = $delivery;
 
@@ -475,6 +452,33 @@ class Motherboard
     public function setFormFactor(?Formfactor $form_factor): self
     {
         $this->form_factor = $form_factor;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Memory>
+     */
+    public function getMemories(): Collection
+    {
+        return $this->memories;
+    }
+
+    public function addMemory(Memory $memory): self
+    {
+        if (!$this->memories->contains($memory)) {
+            $this->memories[] = $memory;
+            $memory->addMotherboard($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMemory(Memory $memory): self
+    {
+        if ($this->memories->removeElement($memory)) {
+            $memory->removeMotherboard($this);
+        }
 
         return $this;
     }
