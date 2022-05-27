@@ -34,11 +34,6 @@ class FormFactor
     #[Groups(['read:FormFactor'])]
     private ?string $name;
 
-    #[ORM\OneToMany(mappedBy: 'form_factor', targetEntity: Firewall::class)]
-    #[Groups(['read:FormFactor'])]
-    #[MaxDepth(1)]
-    private Collection $firewalls;
-
     #[ORM\OneToMany(mappedBy: 'form_factor', targetEntity: M2::class)]
     #[Groups(['read:FormFactor'])]
     #[MaxDepth(1)]
@@ -51,7 +46,6 @@ class FormFactor
 
     #[Pure] public function __construct()
     {
-        $this->firewalls = new ArrayCollection();
         $this->m2s_form_factor = new ArrayCollection();
         $this->motherboards = new ArrayCollection();
     }
@@ -69,36 +63,6 @@ class FormFactor
     public function setName(?string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Firewall>
-     */
-    public function getFirewalls(): Collection
-    {
-        return $this->firewalls;
-    }
-
-    public function addFirewall(Firewall $firewall): self
-    {
-        if (!$this->firewalls->contains($firewall)) {
-            $this->firewalls[] = $firewall;
-            $firewall->setFormFactor($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFirewall(Firewall $firewall): self
-    {
-        if ($this->firewalls->removeElement($firewall)) {
-            // set the owning side to null (unless already changed)
-            if ($firewall->getFormFactor() === $this) {
-                $firewall->setFormFactor(null);
-            }
-        }
 
         return $this;
     }
