@@ -5,7 +5,6 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\MotherboardRepository;
 use DateTimeInterface;
-use Decimal\Decimal;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -111,10 +110,6 @@ class Motherboard
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $url;
 
-    #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
-    #[Groups(['read:Motherboard'])]
-    private ?Decimal $price;
-
     #[ORM\ManyToMany(targetEntity: Barebone::class, mappedBy: 'motherboard')]
     #[Groups(['read:Motherboard'])]
     private ArrayCollection $barebones;
@@ -126,6 +121,10 @@ class Motherboard
     #[Groups(['read:Memory'])]
     #[MaxDepth(1)]
     private ArrayCollection $memories;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Groups(['read:Motherboard'])]
+    private ?float $price;
 
     #[Pure] public function __construct()
     {
@@ -405,18 +404,6 @@ class Motherboard
         return $this;
     }
 
-    public function getPrice(): ?string
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?string $price): self
-    {
-        $this->price = $price;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Barebone>
      */
@@ -479,6 +466,18 @@ class Motherboard
         if ($this->memories->removeElement($memory)) {
             $memory->removeMotherboard($this);
         }
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?float $price): self
+    {
+        $this->price = $price;
 
         return $this;
     }

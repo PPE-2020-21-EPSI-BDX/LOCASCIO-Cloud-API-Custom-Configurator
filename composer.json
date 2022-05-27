@@ -33,8 +33,7 @@
     "symfony/serializer": "6.0.*",
     "symfony/twig-bundle": "6.0.*",
     "symfony/validator": "6.0.*",
-    "symfony/yaml": "6.0.*",
-    "ext-decimal": "*"
+    "symfony/yaml": "6.0.*"
   },
   "require-dev": {
     "justinrainbow/json-schema": "^5.2",

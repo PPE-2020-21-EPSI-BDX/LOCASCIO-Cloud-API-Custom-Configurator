@@ -59,10 +59,6 @@ class Firewall
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $url;
 
-    #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
-    #[Groups(['read:Firewall'])]
-    private ?string $price;
-
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['read:Firewall'])]
     private ?string $dimensions;
@@ -71,6 +67,10 @@ class Firewall
     #[Groups(['read:FormFactor'])]
     #[MaxDepth(1)]
     private ?FormFactor $form_factor;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Groups(['read:Firewall'])]
+    private ?float $price;
 
     public function getId(): ?int
     {
@@ -173,18 +173,6 @@ class Firewall
         return $this;
     }
 
-    public function getPrice(): ?string
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?string $price): self
-    {
-        $this->price = $price;
-
-        return $this;
-    }
-
     public function getFormFactor(): ?FormFactor
     {
         return $this->form_factor;
@@ -205,6 +193,18 @@ class Firewall
     public function setDimensions(?string $dimensions): self
     {
         $this->dimensions = $dimensions;
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?float $price): self
+    {
+        $this->price = $price;
 
         return $this;
     }

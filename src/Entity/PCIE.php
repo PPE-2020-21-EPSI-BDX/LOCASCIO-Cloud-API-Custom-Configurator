@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\PCIERepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -63,7 +64,7 @@ class PCIE
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['read:Pcie'])]
-    private ?\DateTimeInterface $delivery;
+    private ?DateTimeInterface $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private ?string $provider_reference;
@@ -71,9 +72,9 @@ class PCIE
     #[ORM\Column(type: 'string', length: 255)]
     private string $url;
 
-    #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
+    #[ORM\Column(type: 'float', nullable: true)]
     #[Groups(['read:Pcie'])]
-    private ?string $price;
+    private ?float $price;
 
     #[Pure] public function __construct()
     {
@@ -222,12 +223,12 @@ class PCIE
         return $this;
     }
 
-    public function getDelivery(): ?\DateTimeInterface
+    public function getDelivery(): ?DateTimeInterface
     {
         return $this->delivery;
     }
 
-    public function setDelivery(?\DateTimeInterface $delivery): self
+    public function setDelivery(?DateTimeInterface $delivery): self
     {
         $this->delivery = $delivery;
 
@@ -258,12 +259,12 @@ class PCIE
         return $this;
     }
 
-    public function getPrice(): ?string
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice(?string $price): self
+    public function setPrice(?float $price): self
     {
         $this->price = $price;
 

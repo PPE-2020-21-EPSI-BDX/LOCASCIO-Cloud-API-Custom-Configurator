@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\RAIDRepository;
-use Decimal\Decimal;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -69,9 +69,9 @@ class RAID
     #[Groups(['read:Raid'])]
     private ?string $availability;
 
-    #[ORM\Column(type: 'datetime',  nullable: true)]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['read:Raid'])]
-    private ?\DateTimeInterface $delivery;
+    private ?DateTimeInterface $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:Raid'])]
@@ -80,9 +80,9 @@ class RAID
     #[ORM\Column(type: 'string', length: 255)]
     private string $url;
 
-    #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
+    #[ORM\Column(type: 'float', nullable: true)]
     #[Groups(['read:Raid'])]
-    private ?Decimal $price;
+    private ?float $price;
 
     #[Pure] public function __construct()
     {
@@ -244,12 +244,12 @@ class RAID
         return $this;
     }
 
-    public function getDelivery(): ?\DateTimeInterface
+    public function getDelivery(): ?DateTimeInterface
     {
         return $this->delivery;
     }
 
-    public function setDelivery(\DateTimeInterface $delivery): self
+    public function setDelivery(DateTimeInterface $delivery): self
     {
         $this->delivery = $delivery;
 
@@ -280,18 +280,6 @@ class RAID
         return $this;
     }
 
-    public function getPrice(): ?string
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?string $price): self
-    {
-        $this->price = $price;
-
-        return $this;
-    }
-
     public function getInterfaceSupport(): ?string
     {
         return $this->interface_support;
@@ -300,6 +288,18 @@ class RAID
     public function setInterfaceSupport(?string $interface_support): self
     {
         $this->interface_support = $interface_support;
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?float $price): self
+    {
+        $this->price = $price;
 
         return $this;
     }

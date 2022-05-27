@@ -4,9 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\M2Repository;
-use Decimal\Decimal;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -46,7 +44,7 @@ class M2
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['read:M2'])]
-    private ?\DateTimeInterface $delivery;
+    private ?DateTimeInterface $delivery;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:M2'])]
@@ -54,10 +52,6 @@ class M2
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $url;
-
-    #[ORM\Column(type: 'decimal', precision: 14, scale: 2, nullable: true)]
-    #[Groups(['read:M2'])]
-    private ?Decimal $price;
 
     #[ORM\ManyToOne(targetEntity: PCIE::class)]
     #[Groups(['read:Pcie'])]
@@ -68,6 +62,10 @@ class M2
     #[Groups(['read:FormFactor'])]
     #[MaxDepth(1)]
     private ?FormFactor $form_factor;
+
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Groups(['read:M2'])]
+    private ?float $price;
 
 
     #[Pure] public function __construct()
@@ -155,18 +153,6 @@ class M2
         return $this;
     }
 
-    public function getPrice(): ?string
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?string $price): self
-    {
-        $this->price = $price;
-
-        return $this;
-    }
-
     public function getInterface(): ?PCIE
     {
         return $this->interface;
@@ -191,14 +177,26 @@ class M2
         return $this;
     }
 
-    public function getDelivery(): ?\DateTimeInterface
+    public function getDelivery(): ?DateTimeInterface
     {
         return $this->delivery;
     }
 
-    public function setDelivery(?\DateTimeInterface $delivery): self
+    public function setDelivery(?DateTimeInterface $delivery): self
     {
         $this->delivery = $delivery;
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?float $price): self
+    {
+        $this->price = $price;
 
         return $this;
     }
