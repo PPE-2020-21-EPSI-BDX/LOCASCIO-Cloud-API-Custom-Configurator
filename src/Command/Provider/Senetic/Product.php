@@ -256,12 +256,11 @@ class Product
     /**
      * Allows to give the availability
      * @param Crawler $crawler
-     * @return string|null
+     * @return int|null
      * @throws Exception
      */
-    protected function availability(Crawler $crawler): ?string
+    protected function availability(Crawler $crawler): ?int
     {
-
         if ($crawler->filter('div.stock-info > div.data')->count() != 0) {
             return $this->format->convertAvaiability($crawler->filter('div.stock-info > div.data')->text());
         }
@@ -271,10 +270,10 @@ class Product
     /**
      * Allows checking if it out of stock
      * @param Crawler $crawler
-     * @return string|null
+     * @return int|null
      * @throws Exception
      */
-    protected function checkOutOfStock(Crawler $crawler): ?string
+    protected function checkOutOfStock(Crawler $crawler): ?int
     {
         if ($crawler->filter('div.warehouse-box > div.full-width')->count() != 0) {
             return $this->format->convertOutOfStock($crawler->filter('div.warehouse-box > div.full-width')->text());

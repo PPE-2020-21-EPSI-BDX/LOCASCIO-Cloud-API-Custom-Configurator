@@ -54,7 +54,7 @@ class Processor extends Product
                     "application" => $this->application(),
                     "url" => $this->url(),
                     "price" => $this->price($product),
-                    "provider_reference" => $this->providerReference($product),
+                    "providerReference" => $this->providerReference($product),
                     "maxMemCapacity" => $this->maxMemCapacity(),
                     "maxMemSpeed" => $this->maxMemSpeed(),
                     "memType" => $this->memType()

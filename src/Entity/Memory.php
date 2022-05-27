@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: MemoryRepository::class)]
 #[ApiResource(
@@ -40,10 +41,6 @@ class Memory
     #[ORM\Column(type: 'string', length: 50)]
     #[Groups(['read:Memory'])]
     private string $brand;
-
-    #[ORM\Column(type: 'string', length: 10, nullable: true)]
-    #[Groups(['read:Memory'])]
-    private ?string $availability;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['read:Memory'])]
@@ -89,10 +86,17 @@ class Memory
     private ?string $slot_type;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $provider_reference;
+    #[Groups(['read:Memory'])]
+    private ?string $provider_reference;
 
     #[ORM\ManyToMany(targetEntity: Motherboard::class, inversedBy: 'memories')]
+    #[Groups(['read:Motherboard'])]
+    #[MaxDepth(1)]
     private $motherboards;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['read:Memory'])]
+    private ?int $availability;
 
     public function __construct()
     {
@@ -124,18 +128,6 @@ class Memory
     public function setBrand(string $brand): self
     {
         $this->brand = $brand;
-
-        return $this;
-    }
-
-    public function getAvailability(): ?string
-    {
-        return $this->availability;
-    }
-
-    public function setAvailability(?string $availability): self
-    {
-        $this->availability = $availability;
 
         return $this;
     }
@@ -304,6 +296,18 @@ class Memory
     public function removeMotherboard(Motherboard $motherboard): self
     {
         $this->motherboards->removeElement($motherboard);
+
+        return $this;
+    }
+
+    public function getAvailability(): ?int
+    {
+        return $this->availability;
+    }
+
+    public function setAvailability(?int $availability): self
+    {
+        $this->availability = $availability;
 
         return $this;
     }
