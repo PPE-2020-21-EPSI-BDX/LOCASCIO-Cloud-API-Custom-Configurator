@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     itemOperations: [
         'get' => [
             'normalization_context' => [
-                'groups' => ['read:Connector', 'read:Disk', 'read:Raid', 'read:Motherboard'],
+                'groups' => ['read:Connector', 'read:Disk', 'read:Motherboard', 'read:RaidCard'],
                 'enable_max_depth' => true
             ]
         ]
@@ -42,21 +42,23 @@ class Connector
     #[MaxDepth(1)]
     private ArrayCollection $disks;
 
-    #[ORM\OneToMany(mappedBy: 'connector', targetEntity: RAID::class, orphanRemoval: true)]
-    #[Groups(['read:Raid'])]
-    #[MaxDepth(1)]
-    private ArrayCollection $raid_cards;
-
     #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'interface')]
     #[Groups(['read:Motherboard'])]
     #[MaxDepth(1)]
     private ArrayCollection $motherboards;
 
+    #[ORM\ManyToMany(targetEntity: RaidCard::class, mappedBy: 'outputs_to_disks')]
+    #[ORM\JoinTable("raid_card_interface")]
+    #[ORM\JoinColumn("connector_id", "id")]
+    #[Groups(['read:RaidCard'])]
+    #[MaxDepth(1)]
+    private ArrayCollection $raidCards;
+
     public function __construct()
     {
         $this->disks = new ArrayCollection();
-        $this->raid_cards = new ArrayCollection();
         $this->motherboards = new ArrayCollection();
+        $this->raidCards = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -118,35 +120,6 @@ class Connector
         return $this;
     }
 
-    /**
-     * @return Collection<int, RAID>
-     */
-    public function getRaidCards(): Collection
-    {
-        return $this->raid_cards;
-    }
-
-    public function addRaidCard(RAID $raidCard): self
-    {
-        if (!$this->raid_cards->contains($raidCard)) {
-            $this->raid_cards[] = $raidCard;
-            $raidCard->setConnector($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRaidCard(RAID $raidCard): self
-    {
-        if ($this->raid_cards->removeElement($raidCard)) {
-            // set the owning side to null (unless already changed)
-            if ($raidCard->getConnector() === $this) {
-                $raidCard->setConnector(null);
-            }
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Motherboard>
@@ -170,6 +143,33 @@ class Connector
     {
         if ($this->motherboards->removeElement($motherboard)) {
             $motherboard->removeInterface($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RaidCard>
+     */
+    public function getRaidCards(): Collection
+    {
+        return $this->raidCards;
+    }
+
+    public function addRaidCard(RaidCard $raidCard): self
+    {
+        if (!$this->raidCards->contains($raidCard)) {
+            $this->raidCards[] = $raidCard;
+            $raidCard->addOutputsToDisk($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRaidCard(RaidCard $raidCard): self
+    {
+        if ($this->raidCards->removeElement($raidCard)) {
+            $raidCard->removeOutputsToDisk($this);
         }
 
         return $this;

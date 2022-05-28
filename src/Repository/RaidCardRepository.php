@@ -2,32 +2,24 @@
 
 namespace App\Repository;
 
-use App\Entity\RAID;
+use App\Entity\RaidCard;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<RAID>
- *
- * @method RAID|null find($id, $lockMode = null, $lockVersion = null)
- * @method RAID|null findOneBy(array $criteria, array $orderBy = null)
- * @method RAID[]    findAll()
- * @method RAID[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
-class RAIDRepository extends ServiceEntityRepository
+class RaidCardRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, RAID::class);
+        parent::__construct($registry, RaidCard::class);
     }
 
     /**
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function add(RAID $entity, bool $flush = true): void
+    public function add(RaidCard $entity, bool $flush = true): void
     {
         $this->_em->persist($entity);
         if ($flush) {
@@ -39,7 +31,7 @@ class RAIDRepository extends ServiceEntityRepository
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function remove(RAID $entity, bool $flush = true): void
+    public function remove(RaidCard $entity, bool $flush = true): void
     {
         $this->_em->remove($entity);
         if ($flush) {
@@ -48,15 +40,15 @@ class RAIDRepository extends ServiceEntityRepository
     }
 
     // /**
-    //  * @return RAID[] Returns an array of RAID objects
+    //  * @return RaidCard[] Returns an array of RaidCard objects
     //  */
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('r.id', 'ASC')
+            ->orderBy('m.id', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
@@ -65,10 +57,10 @@ class RAIDRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?RAID
+    public function findOneBySomeField($value): ?RaidCard
     {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.exampleField = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()

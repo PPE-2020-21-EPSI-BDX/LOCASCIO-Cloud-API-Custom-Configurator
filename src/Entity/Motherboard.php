@@ -56,11 +56,6 @@ class Motherboard
     #[Groups(['read:Motherboard'])]
     private ?int $nbr_max_sata;
 
-    #[ORM\ManyToOne(targetEntity: RAID::class, inversedBy: 'motherboards')]
-    #[Groups(['read:Motherboard_detail'])]
-    #[MaxDepth(1)]
-    private Collection $raid_support;
-
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
     #[Groups(['read:Motherboard_detail'])]
     private ?string $stata_speed;
@@ -214,18 +209,6 @@ class Motherboard
     public function setNbrMaxSata(?int $nbr_max_sata): self
     {
         $this->nbr_max_sata = $nbr_max_sata;
-
-        return $this;
-    }
-
-    public function getRaidSupport(): Collection
-    {
-        return $this->raid_support;
-    }
-
-    public function setRaidSupport(?RAID $raid_support): self
-    {
-        $this->raid_support = $raid_support;
 
         return $this;
     }
