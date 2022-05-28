@@ -99,8 +99,6 @@ class Motherboard
     #[Groups(['read:Motherboard'])]
     private ArrayCollection $barebones;
 
-    #[ORM\ManyToOne(targetEntity: FormFactor::class, inversedBy: 'motherboards')]
-    private ?Formfactor $form_factor;
 
     #[ORM\ManyToMany(targetEntity: Memory::class, mappedBy: 'motherboards')]
     #[Groups(['read:Memory'])]
@@ -115,6 +113,9 @@ class Motherboard
     #[Groups(['read:Connector'])]
     #[MaxDepth(1)]
     private ArrayCollection $interface;
+
+    #[ORM\ManyToOne(targetEntity: FormFactor::class)]
+    private $form_factor;
 
     #[Pure] public function __construct()
     {
@@ -360,18 +361,6 @@ class Motherboard
         return $this;
     }
 
-    public function getFormFactor(): ?Formfactor
-    {
-        return $this->form_factor;
-    }
-
-    public function setFormFactor(?Formfactor $form_factor): self
-    {
-        $this->form_factor = $form_factor;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Memory>
      */
@@ -431,6 +420,18 @@ class Motherboard
     public function removeInterface(Connector $interface): self
     {
         $this->interface->removeElement($interface);
+
+        return $this;
+    }
+
+    public function getFormFactor(): ?FormFactor
+    {
+        return $this->form_factor;
+    }
+
+    public function setFormFactor(?FormFactor $form_factor): self
+    {
+        $this->form_factor = $form_factor;
 
         return $this;
     }

@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     itemOperations: [
         'get' => [
             'normalization_context' => [
-                'groups' => ['read:Disk', 'read:FormFactor', 'read:Connector'],
+                'groups' => ['read:Disk', 'read:Connector'],
                 'enable_max_depth' => true
             ]
         ]
@@ -31,12 +31,6 @@ class Disk
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['read:Disk'])]
     private string $name;
-
-    #[ORM\ManyToOne(targetEntity: FormFactor::class, inversedBy: 'disks')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:FormFactor'])]
-    #[MaxDepth(1)]
-    private FormFactor $form_factor;
 
     #[ORM\Column(type: 'string', length: 10)]
     #[Groups(['read:Disk'])]
@@ -92,6 +86,9 @@ class Disk
     #[Groups(['read:Disk'])]
     private float $price;
 
+    #[ORM\ManyToOne(targetEntity: FormFactor::class)]
+    private $form_factor;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,18 +102,6 @@ class Disk
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getFormFactor(): ?FormFactor
-    {
-        return $this->form_factor;
-    }
-
-    public function setFormFactor(?FormFactor $form_factor): self
-    {
-        $this->form_factor = $form_factor;
 
         return $this;
     }
@@ -273,6 +258,18 @@ class Disk
     public function setPrice(float $price): self
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    public function getFormFactor(): ?FormFactor
+    {
+        return $this->form_factor;
+    }
+
+    public function setFormFactor(?FormFactor $form_factor): self
+    {
+        $this->form_factor = $form_factor;
 
         return $this;
     }
