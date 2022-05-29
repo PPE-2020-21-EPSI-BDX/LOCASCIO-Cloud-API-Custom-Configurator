@@ -2,13 +2,28 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\RackRepository;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RackRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations: ['get', 'post'],
+    itemOperations: [
+        'get' => [
+            'normalization_context' => [
+                'groups' => []
+            ]
+        ],
+        'patch' => []
+    ],
+    paginationItemsPerPage: 2,
+    paginationMaximumItemsPerPage: 2
+)]
+#[ApiFilter(SearchFilter::class, properties: ['provider_reference' => 'exact'])]
 class Rack
 {
     #[ORM\Id]
@@ -19,20 +34,18 @@ class Rack
     #[ORM\Column(type: 'string', length: 255)]
     private string $name;
 
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $brand;
+
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $picture;
 
-    #[ORM\Column(type: 'string', length: 25)]
-    private string $type;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $width;
 
-    #[ORM\Column(type: 'integer')]
-    private int $width;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $depth;
 
-    #[ORM\Column(type: 'integer')]
-    private int $depth;
-
-    #[ORM\Column(type: 'integer')]
-    private int $height;
 
     #[ORM\Column(type: 'float', nullable: true)]
     private ?float $weight;
@@ -51,6 +64,12 @@ class Rack
 
     #[ORM\Column(type: 'float', nullable: true)]
     private ?float $price;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $height;
+
+    #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    private $type;
 
     public function getId(): ?int
     {
@@ -77,55 +96,6 @@ class Rack
     public function setPicture(?string $picture): self
     {
         $this->picture = $picture;
-
-        return $this;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): self
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    public function getWidth(): ?int
-    {
-        return $this->width;
-    }
-
-    public function setWidth(?int $width): self
-    {
-        $this->width = $width;
-
-        return $this;
-    }
-
-    public function getDepth(): ?int
-    {
-        return $this->depth;
-    }
-
-    public function setDepth(?int $depth): self
-    {
-        $this->depth = $depth;
-
-        return $this;
-    }
-
-
-    public function getWeight(): ?float
-    {
-        return $this->weight;
-    }
-
-    public function setWeight(?float $weight): self
-    {
-        $this->weight = $weight;
 
         return $this;
     }
@@ -178,18 +148,6 @@ class Rack
         return $this;
     }
 
-    public function getHeight(): ?int
-    {
-        return $this->height;
-    }
-
-    public function setHeight(int $height): self
-    {
-        $this->height = $height;
-
-        return $this;
-    }
-
     public function getDelivery(): ?DateTimeInterface
     {
         return $this->delivery;
@@ -198,6 +156,78 @@ class Rack
     public function setDelivery(?DateTimeInterface $delivery): self
     {
         $this->delivery = $delivery;
+
+        return $this;
+    }
+
+    public function getBrand(): ?string
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(?string $brand): self
+    {
+        $this->brand = $brand;
+
+        return $this;
+    }
+
+    public function getWidth(): ?int
+    {
+        return $this->width;
+    }
+
+    public function setWidth(?int $width): self
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    public function getDepth(): ?int
+    {
+        return $this->depth;
+    }
+
+    public function setDepth(?int $depth): self
+    {
+        $this->depth = $depth;
+
+        return $this;
+    }
+
+    public function getWeight(): ?float
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(?float $weight): self
+    {
+        $this->weight = $weight;
+
+        return $this;
+    }
+
+    public function getHeight(): ?int
+    {
+        return $this->height;
+    }
+
+    public function setHeight(?int $height): self
+    {
+        $this->height = $height;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }
