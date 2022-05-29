@@ -74,10 +74,6 @@ class Motherboard
     #[Groups(['read:Motherboard'])]
     private ?int $availability;
 
-    #[ORM\ManyToMany(targetEntity: Barebone::class)]
-    #[Groups(['read:Barebone'])]
-    private ArrayCollection $barebones;
-
     #[ORM\ManyToMany(targetEntity: Memory::class)]
     private $memories;
 
@@ -87,7 +83,6 @@ class Motherboard
     #[Pure] public function __construct()
     {
         $this->output = new ArrayCollection();
-        $this->barebones = new ArrayCollection();
         $this->memories = new ArrayCollection();
         $this->processors = new ArrayCollection();
     }
@@ -225,30 +220,6 @@ class Motherboard
     public function setAvailability(?int $availability): self
     {
         $this->availability = $availability;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Barebone>
-     */
-    public function getBarebones(): Collection
-    {
-        return $this->barebones;
-    }
-
-    public function addBarebone(Barebone $barebone): self
-    {
-        if (!$this->barebones->contains($barebone)) {
-            $this->barebones[] = $barebone;
-        }
-
-        return $this;
-    }
-
-    public function removeBarebone(Barebone $barebone): self
-    {
-        $this->barebones->removeElement($barebone);
 
         return $this;
     }
