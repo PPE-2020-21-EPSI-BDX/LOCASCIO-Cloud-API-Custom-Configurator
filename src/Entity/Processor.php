@@ -8,13 +8,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\ProcessorRepository;
 use DateTime;
 use DateTimeInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Context;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 #[ORM\Entity(repositoryClass: ProcessorRepository::class)]
@@ -108,11 +104,6 @@ class Processor
     #[ORM\Column(type: 'string', length: 255)]
     private string $url;
 
-    #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'processors')]
-    #[Groups(['read:Motherboard'])]
-    #[MaxDepth(1)]
-    private Collection $motherboards;
-
     #[ORM\Column(type: 'float', nullable: true)]
     #[Groups(['read:Processor'])]
     private ?float $price;
@@ -128,11 +119,6 @@ class Processor
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['read:Processor'])]
     private ?int $availability;
-
-    #[Pure] public function __construct()
-    {
-        $this->motherboards = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -339,33 +325,6 @@ class Processor
     public function setUrl(string $url): self
     {
         $this->url = $url;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Motherboard>
-     */
-    public function getMotherboards(): Collection
-    {
-        return $this->motherboards;
-    }
-
-    public function addMotherboard(Motherboard $motherboard): self
-    {
-        if (!$this->motherboards->contains($motherboard)) {
-            $this->motherboards[] = $motherboard;
-            $motherboard->addProcessor($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMotherboard(Motherboard $motherboard): self
-    {
-        if ($this->motherboards->removeElement($motherboard)) {
-            $motherboard->removeProcessor($this);
-        }
 
         return $this;
     }

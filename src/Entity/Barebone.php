@@ -5,10 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\BareboneRepository;
 use DateTimeInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BareboneRepository::class)]
@@ -49,20 +46,10 @@ class Barebone
     #[ORM\Column(type: 'string', length: 255)]
     private string $url;
 
-
-    #[ORM\ManyToMany(targetEntity: Motherboard::class, inversedBy: 'barebones')]
-    #[Groups(['read:Motherboard'])]
-    private ArrayCollection $motherboard;
-
     #[ORM\Column(type: 'float', nullable: true)]
     #[Groups(['read:Barebone'])]
     private ?float $price;
 
-    #[Pure]
-    public function __construct()
-    {
-        $this->motherboard = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -125,30 +112,6 @@ class Barebone
     public function setUrl(string $url): self
     {
         $this->url = $url;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Motherboard>
-     */
-    public function getMotherboard(): Collection
-    {
-        return $this->motherboard;
-    }
-
-    public function addMotherboard(Motherboard $motherboard): self
-    {
-        if (!$this->motherboard->contains($motherboard)) {
-            $this->motherboard[] = $motherboard;
-        }
-
-        return $this;
-    }
-
-    public function removeMotherboard(Motherboard $motherboard): self
-    {
-        $this->motherboard->removeElement($motherboard);
 
         return $this;
     }

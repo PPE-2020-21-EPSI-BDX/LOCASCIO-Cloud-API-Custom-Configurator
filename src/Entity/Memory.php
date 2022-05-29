@@ -7,11 +7,8 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\MemoryRepository;
 use DateTimeInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: MemoryRepository::class)]
 #[ApiResource(
@@ -89,19 +86,9 @@ class Memory
     #[Groups(['read:Memory'])]
     private ?string $provider_reference;
 
-    #[ORM\ManyToMany(targetEntity: Motherboard::class, inversedBy: 'memories')]
-    #[Groups(['read:Motherboard'])]
-    #[MaxDepth(1)]
-    private $motherboards;
-
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['read:Memory'])]
     private ?int $availability;
-
-    public function __construct()
-    {
-        $this->motherboards = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -272,30 +259,6 @@ class Memory
     public function setProviderReference(?string $provider_reference): self
     {
         $this->provider_reference = $provider_reference;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Motherboard>
-     */
-    public function getMotherboards(): Collection
-    {
-        return $this->motherboards;
-    }
-
-    public function addMotherboard(Motherboard $motherboard): self
-    {
-        if (!$this->motherboards->contains($motherboard)) {
-            $this->motherboards[] = $motherboard;
-        }
-
-        return $this;
-    }
-
-    public function removeMotherboard(Motherboard $motherboard): self
-    {
-        $this->motherboards->removeElement($motherboard);
 
         return $this;
     }

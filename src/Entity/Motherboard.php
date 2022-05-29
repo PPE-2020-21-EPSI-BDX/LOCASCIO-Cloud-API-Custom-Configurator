@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\MotherboardRepository;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -10,20 +12,23 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: MotherboardRepository::class)]
 #[ApiResource(
-    collectionOperations: ['get'],
+    collectionOperations: ['get', 'post'],
     itemOperations: [
         'get' => [
             'normalization_context' => [
                 'groups' => ['read:Motherboard', 'read:FormFactor', 'read:Motherboard_detail', 'read:Processor', 'read:Memory', 'read:Connector'],
                 'enable_max_depth' => true
             ]
-        ]
-    ]
+        ],
+        'patch' => []
+    ],
+    paginationItemsPerPage: 2,
+    paginationMaximumItemsPerPage: 2
 )]
+#[ApiFilter(SearchFilter::class, properties: ['provider_reference' => 'exact'])]
 class Motherboard
 {
     #[ORM\Id]
@@ -35,54 +40,9 @@ class Motherboard
     #[Groups(['read:Motherboard'])]
     private string $name;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Motherboard_detail'])]
-    private ?string $dimension;
-
-    #[ORM\ManyToMany(targetEntity: Processor::class, inversedBy: 'motherboards')]
-    #[Groups(['read:Processor'])]
-    #[MaxDepth(1)]
-    private Collection $processors;
-
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['read:Motherboard_detail'])]
     private ?string $processor_note;
-
-    #[ORM\Column(type: 'integer')]
-    #[Groups(['read:Motherboard_detail'])]
-    private int $mem_slots;
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    #[Groups(['read:Motherboard'])]
-    private ?int $nbr_max_sata;
-
-    #[ORM\Column(type: 'string', length: 10, nullable: true)]
-    #[Groups(['read:Motherboard_detail'])]
-    private ?string $stata_speed;
-
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Motherboard'])]
-    private ?string $lan;
-
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Motherboard_detail'])]
-    private ?string $usb;
-
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Motherboard_detail'])]
-    private ?string $video_output;
-
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Motherboard_detail'])]
-    private ?string $dom;
-
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['read:Motherboard_detail'])]
-    private ?string $tpm;
-
-    #[ORM\Column(type: 'string', length: 10, nullable: true)]
-    #[Groups(['read:Motherboard'])]
-    private ?string $availability;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Groups(['read:Motherboard'])]
@@ -95,34 +55,41 @@ class Motherboard
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private string $url;
 
-    #[ORM\ManyToMany(targetEntity: Barebone::class, mappedBy: 'motherboard')]
-    #[Groups(['read:Motherboard'])]
-    private ArrayCollection $barebones;
-
-
-    #[ORM\ManyToMany(targetEntity: Memory::class, mappedBy: 'motherboards')]
-    #[Groups(['read:Memory'])]
-    #[MaxDepth(1)]
-    private ArrayCollection $memories;
-
     #[ORM\Column(type: 'float', nullable: true)]
     #[Groups(['read:Motherboard'])]
     private ?float $price;
 
-    #[ORM\ManyToMany(targetEntity: Connector::class, inversedBy: 'motherboards')]
-    #[Groups(['read:Connector'])]
-    #[MaxDepth(1)]
-    private ArrayCollection $interface;
-
     #[ORM\ManyToOne(targetEntity: FormFactor::class)]
-    private $form_factor;
+    private ?FormFactor $form_factor;
+
+    #[ORM\Column(type: 'integer')]
+    private int $tpm;
+
+    #[ORM\ManyToMany(targetEntity: Connector::class)]
+    #[ORM\JoinTable("motherboard_interface")]
+    #[Groups(['read:Connector'])]
+    private ArrayCollection $output;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['read:Motherboard'])]
+    private ?int $availability;
+
+    #[ORM\ManyToMany(targetEntity: Barebone::class)]
+    #[Groups(['read:Barebone'])]
+    private ArrayCollection $barebones;
+
+    #[ORM\ManyToMany(targetEntity: Memory::class)]
+    private $memories;
+
+    #[ORM\ManyToMany(targetEntity: Processor::class)]
+    private $processors;
 
     #[Pure] public function __construct()
     {
-        $this->processors = new ArrayCollection();
+        $this->output = new ArrayCollection();
         $this->barebones = new ArrayCollection();
         $this->memories = new ArrayCollection();
-        $this->interface = new ArrayCollection();
+        $this->processors = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -142,42 +109,6 @@ class Motherboard
         return $this;
     }
 
-    public function getDimension(): ?string
-    {
-        return $this->dimension;
-    }
-
-    public function setDimension(?string $dimension): self
-    {
-        $this->dimension = $dimension;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Processor>
-     */
-    public function getProcessors(): Collection
-    {
-        return $this->processors;
-    }
-
-    public function addProcessor(Processor $processor): self
-    {
-        if (!$this->processors->contains($processor)) {
-            $this->processors[] = $processor;
-        }
-
-        return $this;
-    }
-
-    public function removeProcessor(Processor $processor): self
-    {
-        $this->processors->removeElement($processor);
-
-        return $this;
-    }
-
     public function getProcessorNote(): ?string
     {
         return $this->processor_note;
@@ -186,114 +117,6 @@ class Motherboard
     public function setProcessorNote(?string $processor_note): self
     {
         $this->processor_note = $processor_note;
-
-        return $this;
-    }
-
-    public function getMemSlots(): ?int
-    {
-        return $this->mem_slots;
-    }
-
-    public function setMemSlots(int $mem_slots): self
-    {
-        $this->mem_slots = $mem_slots;
-
-        return $this;
-    }
-
-    public function getNbrMaxSata(): ?int
-    {
-        return $this->nbr_max_sata;
-    }
-
-    public function setNbrMaxSata(?int $nbr_max_sata): self
-    {
-        $this->nbr_max_sata = $nbr_max_sata;
-
-        return $this;
-    }
-
-    public function getStataSpeed(): ?string
-    {
-        return $this->stata_speed;
-    }
-
-    public function setStataSpeed(?string $stata_speed): self
-    {
-        $this->stata_speed = $stata_speed;
-
-        return $this;
-    }
-
-    public function getLan(): ?string
-    {
-        return $this->lan;
-    }
-
-    public function setLan(?string $lan): self
-    {
-        $this->lan = $lan;
-
-        return $this;
-    }
-
-    public function getUsb(): ?string
-    {
-        return $this->usb;
-    }
-
-    public function setUsb(?string $usb): self
-    {
-        $this->usb = $usb;
-
-        return $this;
-    }
-
-    public function getVideoOutput(): ?string
-    {
-        return $this->video_output;
-    }
-
-    public function setVideoOutput(?string $video_output): self
-    {
-        $this->video_output = $video_output;
-
-        return $this;
-    }
-
-    public function getDom(): ?string
-    {
-        return $this->dom;
-    }
-
-    public function setDom(?string $dom): self
-    {
-        $this->dom = $dom;
-
-        return $this;
-    }
-
-    public function getTpm(): ?string
-    {
-        return $this->tpm;
-    }
-
-    public function setTpm(?string $tpm): self
-    {
-        $this->tpm = $tpm;
-
-        return $this;
-    }
-
-    public function getAvailability(): ?string
-    {
-        return $this->availability;
-    }
-
-    public function setAvailability(?string $availability): self
-    {
-        $this->availability = $availability;
 
         return $this;
     }
@@ -334,6 +157,78 @@ class Motherboard
         return $this;
     }
 
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?float $price): self
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function getFormFactor(): ?FormFactor
+    {
+        return $this->form_factor;
+    }
+
+    public function setFormFactor(?FormFactor $form_factor): self
+    {
+        $this->form_factor = $form_factor;
+
+        return $this;
+    }
+
+    public function getTpm(): ?int
+    {
+        return $this->tpm;
+    }
+
+    public function setTpm(int $tpm): self
+    {
+        $this->tpm = $tpm;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Connector>
+     */
+    public function getOutput(): Collection
+    {
+        return $this->output;
+    }
+
+    public function addOutput(Connector $output): self
+    {
+        if (!$this->output->contains($output)) {
+            $this->output[] = $output;
+        }
+
+        return $this;
+    }
+
+    public function removeOutput(Connector $output): self
+    {
+        $this->output->removeElement($output);
+
+        return $this;
+    }
+
+    public function getAvailability(): ?int
+    {
+        return $this->availability;
+    }
+
+    public function setAvailability(?int $availability): self
+    {
+        $this->availability = $availability;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Barebone>
      */
@@ -346,7 +241,6 @@ class Motherboard
     {
         if (!$this->barebones->contains($barebone)) {
             $this->barebones[] = $barebone;
-            $barebone->addMotherboard($this);
         }
 
         return $this;
@@ -354,9 +248,7 @@ class Motherboard
 
     public function removeBarebone(Barebone $barebone): self
     {
-        if ($this->barebones->removeElement($barebone)) {
-            $barebone->removeMotherboard($this);
-        }
+        $this->barebones->removeElement($barebone);
 
         return $this;
     }
@@ -373,7 +265,6 @@ class Motherboard
     {
         if (!$this->memories->contains($memory)) {
             $this->memories[] = $memory;
-            $memory->addMotherboard($this);
         }
 
         return $this;
@@ -381,57 +272,31 @@ class Motherboard
 
     public function removeMemory(Memory $memory): self
     {
-        if ($this->memories->removeElement($memory)) {
-            $memory->removeMotherboard($this);
-        }
-
-        return $this;
-    }
-
-    public function getPrice(): ?float
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?float $price): self
-    {
-        $this->price = $price;
+        $this->memories->removeElement($memory);
 
         return $this;
     }
 
     /**
-     * @return Collection<int, Connector>
+     * @return Collection<int, Processor>
      */
-    public function getInterface(): Collection
+    public function getProcessors(): Collection
     {
-        return $this->interface;
+        return $this->processors;
     }
 
-    public function addInterface(Connector $interface): self
+    public function addProcessor(Processor $processor): self
     {
-        if (!$this->interface->contains($interface)) {
-            $this->interface[] = $interface;
+        if (!$this->processors->contains($processor)) {
+            $this->processors[] = $processor;
         }
 
         return $this;
     }
 
-    public function removeInterface(Connector $interface): self
+    public function removeProcessor(Processor $processor): self
     {
-        $this->interface->removeElement($interface);
-
-        return $this;
-    }
-
-    public function getFormFactor(): ?FormFactor
-    {
-        return $this->form_factor;
-    }
-
-    public function setFormFactor(?FormFactor $form_factor): self
-    {
-        $this->form_factor = $form_factor;
+        $this->processors->removeElement($processor);
 
         return $this;
     }

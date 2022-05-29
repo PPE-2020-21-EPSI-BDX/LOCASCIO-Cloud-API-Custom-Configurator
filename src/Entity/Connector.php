@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
     itemOperations: [
         'get' => [
             'normalization_context' => [
-                'groups' => ['read:Connector', 'read:Disk', 'read:Motherboard', 'read:RaidCard'],
+                'groups' => ['read:Connector', 'read:Disk', 'read:RaidCard'],
                 'enable_max_depth' => true
             ]
         ]
@@ -42,11 +42,6 @@ class Connector
     #[MaxDepth(1)]
     private ArrayCollection $disks;
 
-    #[ORM\ManyToMany(targetEntity: Motherboard::class, mappedBy: 'interface')]
-    #[Groups(['read:Motherboard'])]
-    #[MaxDepth(1)]
-    private ArrayCollection $motherboards;
-
     #[ORM\ManyToMany(targetEntity: RaidCard::class, mappedBy: 'outputs_to_disks')]
     #[ORM\JoinTable("raid_card_interface")]
     #[ORM\JoinColumn("connector_id", "id")]
@@ -57,7 +52,6 @@ class Connector
     public function __construct()
     {
         $this->disks = new ArrayCollection();
-        $this->motherboards = new ArrayCollection();
         $this->raidCards = new ArrayCollection();
     }
 
@@ -115,34 +109,6 @@ class Connector
             if ($disk->getInterface() === $this) {
                 $disk->setInterface(null);
             }
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @return Collection<int, Motherboard>
-     */
-    public function getMotherboards(): Collection
-    {
-        return $this->motherboards;
-    }
-
-    public function addMotherboard(Motherboard $motherboard): self
-    {
-        if (!$this->motherboards->contains($motherboard)) {
-            $this->motherboards[] = $motherboard;
-            $motherboard->addInterface($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMotherboard(Motherboard $motherboard): self
-    {
-        if ($this->motherboards->removeElement($motherboard)) {
-            $motherboard->removeInterface($this);
         }
 
         return $this;
