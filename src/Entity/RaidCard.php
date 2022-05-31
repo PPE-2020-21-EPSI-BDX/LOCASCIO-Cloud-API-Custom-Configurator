@@ -47,13 +47,6 @@ class RaidCard
     #[MaxDepth(1)]
     private Connector $input_to_motherboard;
 
-    #[ORM\ManyToMany(targetEntity: Connector::class, inversedBy: 'raidCards')]
-    #[ORM\JoinTable("raid_card_interface")]
-    #[ORM\JoinColumn("raid_card_id", "id")]
-    #[Groups(['read:Connector'])]
-    #[MaxDepth(1)]
-    private ArrayCollection $outputs_to_disks;
-
     #[ORM\ManyToMany(targetEntity: Level::class, inversedBy: 'raidCards')]
     #[Groups(['read:Level'])]
     #[MaxDepth(1)]
@@ -81,7 +74,6 @@ class RaidCard
 
     public function __construct()
     {
-        $this->outputs_to_disks = new ArrayCollection();
         $this->levels = new ArrayCollection();
     }
 
@@ -123,30 +115,6 @@ class RaidCard
     public function setInputToMotherboard(?Connector $input_to_motherboard): self
     {
         $this->input_to_motherboard = $input_to_motherboard;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Connector>
-     */
-    public function getOutputsToDisks(): Collection
-    {
-        return $this->outputs_to_disks;
-    }
-
-    public function addOutputsToDisk(Connector $outputsToDisk): self
-    {
-        if (!$this->outputs_to_disks->contains($outputsToDisk)) {
-            $this->outputs_to_disks[] = $outputsToDisk;
-        }
-
-        return $this;
-    }
-
-    public function removeOutputsToDisk(Connector $outputsToDisk): self
-    {
-        $this->outputs_to_disks->removeElement($outputsToDisk);
 
         return $this;
     }

@@ -2,16 +2,17 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\DiskRepository;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 #[ORM\Entity(repositoryClass: DiskRepository::class)]
 #[ApiResource(
-    collectionOperations: ['get'],
+    collectionOperations: ['get', 'post'],
     itemOperations: [
         'get' => [
             'normalization_context' => [
@@ -19,8 +20,11 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
                 'enable_max_depth' => true
             ]
         ]
-    ]
+    ],
+    paginationItemsPerPage: 2,
+    paginationMaximumItemsPerPage: 2
 )]
+#[ApiFilter(SearchFilter::class, properties: ['provider_reference' => 'exact'])]
 class Disk
 {
     #[ORM\Id]
@@ -31,6 +35,10 @@ class Disk
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['read:Disk'])]
     private string $name;
+
+    #[ORM\Column(type: 'string', length: 50)]
+    #[Groups(['read:Disk'])]
+    private ?string $brand;
 
     #[ORM\Column(type: 'string', length: 10)]
     #[Groups(['read:Disk'])]
@@ -51,12 +59,6 @@ class Disk
     #[ORM\Column(type: 'string', length: 20, nullable: true)]
     #[Groups(['read:Disk'])]
     private ?string $random_writing;
-
-    #[ORM\ManyToOne(targetEntity: Connector::class, inversedBy: 'disks')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['read:Connector'])]
-    #[MaxDepth(1)]
-    private Connector $interface;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:Disk'])]
@@ -87,7 +89,11 @@ class Disk
     private float $price;
 
     #[ORM\ManyToOne(targetEntity: FormFactor::class)]
-    private $form_factor;
+    private ?FormFactor $form_factor;
+
+    #[ORM\ManyToOne(targetEntity: Connector::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private $interface;
 
     public function getId(): ?int
     {
@@ -162,18 +168,6 @@ class Disk
     public function setRandomWriting(?string $random_writing): self
     {
         $this->random_writing = $random_writing;
-
-        return $this;
-    }
-
-    public function getInterface(): ?Connector
-    {
-        return $this->interface;
-    }
-
-    public function setInterface(?Connector $interface): self
-    {
-        $this->interface = $interface;
 
         return $this;
     }
@@ -270,6 +264,30 @@ class Disk
     public function setFormFactor(?FormFactor $form_factor): self
     {
         $this->form_factor = $form_factor;
+
+        return $this;
+    }
+
+    public function getBrand(): ?string
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(string $brand): self
+    {
+        $this->brand = $brand;
+
+        return $this;
+    }
+
+    public function getInterface(): ?Connector
+    {
+        return $this->interface;
+    }
+
+    public function setInterface(?Connector $interface): self
+    {
+        $this->interface = $interface;
 
         return $this;
     }

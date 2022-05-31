@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20220531082750 extends AbstractMigration
+final class Version20220531100919 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,8 +20,8 @@ final class Version20220531082750 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE connector (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, max_transfert_speed VARCHAR(25) DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE disk (id INT AUTO_INCREMENT NOT NULL, interface_id INT NOT NULL, form_factor_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, capacity VARCHAR(10) NOT NULL, read_speed VARCHAR(10) DEFAULT NULL, write_speed VARCHAR(10) DEFAULT NULL, shuffle_playback VARCHAR(20) DEFAULT NULL, random_writing VARCHAR(20) DEFAULT NULL, application VARCHAR(50) DEFAULT NULL, hdd_rotation_speed VARCHAR(20) DEFAULT NULL, availability INT DEFAULT NULL, delivery DATETIME DEFAULT NULL, provider_reference VARCHAR(50) NOT NULL, url VARCHAR(255) NOT NULL, price DOUBLE PRECISION NOT NULL, INDEX IDX_C74DD02AB0BE982 (interface_id), INDEX IDX_C74DD02CD887EAF (form_factor_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE connector (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, max_transfer_speed VARCHAR(50) DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE disk (id INT AUTO_INCREMENT NOT NULL, form_factor_id INT DEFAULT NULL, interface_id INT NOT NULL, name VARCHAR(255) NOT NULL, brand VARCHAR(50) NOT NULL, capacity VARCHAR(10) NOT NULL, read_speed VARCHAR(10) DEFAULT NULL, write_speed VARCHAR(10) DEFAULT NULL, shuffle_playback VARCHAR(20) DEFAULT NULL, random_writing VARCHAR(20) DEFAULT NULL, application VARCHAR(50) DEFAULT NULL, hdd_rotation_speed VARCHAR(20) DEFAULT NULL, availability INT DEFAULT NULL, delivery DATETIME DEFAULT NULL, provider_reference VARCHAR(50) NOT NULL, url VARCHAR(255) NOT NULL, price DOUBLE PRECISION NOT NULL, INDEX IDX_C74DD02CD887EAF (form_factor_id), INDEX IDX_C74DD02AB0BE982 (interface_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE form_factor (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE indicator (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(50) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE level (id INT AUTO_INCREMENT NOT NULL, level INT NOT NULL, min_disk INT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -38,10 +38,10 @@ final class Version20220531082750 extends AbstractMigration
         $this->addSql('CREATE TABLE rack_power (id INT AUTO_INCREMENT NOT NULL, rack_id INT NOT NULL, power_id INT DEFAULT NULL, power_supply_included INT DEFAULT NULL, redundant_power INT DEFAULT NULL, INDEX IDX_1D8B5BEC8E86A33E (rack_id), INDEX IDX_1D8B5BECAB4FC384 (power_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE rack_storage (id INT AUTO_INCREMENT NOT NULL, rack_id INT NOT NULL, disk_form_factor_id INT NOT NULL, storage_connector_id INT NOT NULL, INDEX IDX_830815D68E86A33E (rack_id), INDEX IDX_830815D6D5B29D06 (disk_form_factor_id), INDEX IDX_830815D616BD7E2 (storage_connector_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE raid_card (id INT AUTO_INCREMENT NOT NULL, input_to_motherboard_id INT NOT NULL, name VARCHAR(255) NOT NULL, max_nbr_disk INT NOT NULL, availability INT DEFAULT NULL, delivery DATETIME DEFAULT NULL, provider_reference VARCHAR(50) NOT NULL, price DOUBLE PRECISION NOT NULL, url VARCHAR(255) NOT NULL, INDEX IDX_2445047796F83576 (input_to_motherboard_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE raid_card_interface (raid_card_id INT NOT NULL, connector_id INT NOT NULL, INDEX IDX_6A9E532B5525CBDA (raid_card_id), INDEX IDX_6A9E532B4D085745 (connector_id), PRIMARY KEY(raid_card_id, connector_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE raid_card_level (raid_card_id INT NOT NULL, level_id INT NOT NULL, INDEX IDX_60FBFD055525CBDA (raid_card_id), INDEX IDX_60FBFD055FB14BA7 (level_id), PRIMARY KEY(raid_card_id, level_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE disk ADD CONSTRAINT FK_C74DD02AB0BE982 FOREIGN KEY (interface_id) REFERENCES connector (id)');
+        $this->addSql('CREATE TABLE raid_card_interface (id INT AUTO_INCREMENT NOT NULL, raid_card_id INT DEFAULT NULL, connector_id INT DEFAULT NULL, INDEX IDX_6A9E532B5525CBDA (raid_card_id), INDEX IDX_6A9E532B4D085745 (connector_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE disk ADD CONSTRAINT FK_C74DD02CD887EAF FOREIGN KEY (form_factor_id) REFERENCES form_factor (id)');
+        $this->addSql('ALTER TABLE disk ADD CONSTRAINT FK_C74DD02AB0BE982 FOREIGN KEY (interface_id) REFERENCES connector (id)');
         $this->addSql('ALTER TABLE motherboard ADD CONSTRAINT FK_7F7A0F2BCD887EAF FOREIGN KEY (form_factor_id) REFERENCES form_factor (id)');
         $this->addSql('ALTER TABLE motherboard_interface ADD CONSTRAINT FK_36DC57AC6511E8A3 FOREIGN KEY (motherboard_id) REFERENCES motherboard (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE motherboard_interface ADD CONSTRAINT FK_36DC57AC4D085745 FOREIGN KEY (connector_id) REFERENCES connector (id) ON DELETE CASCADE');
@@ -59,10 +59,10 @@ final class Version20220531082750 extends AbstractMigration
         $this->addSql('ALTER TABLE rack_storage ADD CONSTRAINT FK_830815D6D5B29D06 FOREIGN KEY (disk_form_factor_id) REFERENCES form_factor (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE rack_storage ADD CONSTRAINT FK_830815D616BD7E2 FOREIGN KEY (storage_connector_id) REFERENCES connector (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE raid_card ADD CONSTRAINT FK_2445047796F83576 FOREIGN KEY (input_to_motherboard_id) REFERENCES connector (id)');
-        $this->addSql('ALTER TABLE raid_card_interface ADD CONSTRAINT FK_6A9E532B5525CBDA FOREIGN KEY (raid_card_id) REFERENCES raid_card (id)');
-        $this->addSql('ALTER TABLE raid_card_interface ADD CONSTRAINT FK_6A9E532B4D085745 FOREIGN KEY (connector_id) REFERENCES connector (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE raid_card_level ADD CONSTRAINT FK_60FBFD055525CBDA FOREIGN KEY (raid_card_id) REFERENCES raid_card (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE raid_card_level ADD CONSTRAINT FK_60FBFD055FB14BA7 FOREIGN KEY (level_id) REFERENCES level (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE raid_card_interface ADD CONSTRAINT FK_6A9E532B5525CBDA FOREIGN KEY (raid_card_id) REFERENCES raid_card (id)');
+        $this->addSql('ALTER TABLE raid_card_interface ADD CONSTRAINT FK_6A9E532B4D085745 FOREIGN KEY (connector_id) REFERENCES connector (id)');
     }
 
     public function down(Schema $schema): void
@@ -89,8 +89,8 @@ final class Version20220531082750 extends AbstractMigration
         $this->addSql('ALTER TABLE rack_indicator DROP FOREIGN KEY FK_5AC4F6A88E86A33E');
         $this->addSql('ALTER TABLE rack_power DROP FOREIGN KEY FK_1D8B5BEC8E86A33E');
         $this->addSql('ALTER TABLE rack_storage DROP FOREIGN KEY FK_830815D68E86A33E');
-        $this->addSql('ALTER TABLE raid_card_interface DROP FOREIGN KEY FK_6A9E532B5525CBDA');
         $this->addSql('ALTER TABLE raid_card_level DROP FOREIGN KEY FK_60FBFD055525CBDA');
+        $this->addSql('ALTER TABLE raid_card_interface DROP FOREIGN KEY FK_6A9E532B5525CBDA');
         $this->addSql('DROP TABLE connector');
         $this->addSql('DROP TABLE disk');
         $this->addSql('DROP TABLE form_factor');
@@ -109,7 +109,7 @@ final class Version20220531082750 extends AbstractMigration
         $this->addSql('DROP TABLE rack_power');
         $this->addSql('DROP TABLE rack_storage');
         $this->addSql('DROP TABLE raid_card');
-        $this->addSql('DROP TABLE raid_card_interface');
         $this->addSql('DROP TABLE raid_card_level');
+        $this->addSql('DROP TABLE raid_card_interface');
     }
 }
