@@ -2,10 +2,22 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\RackStorageRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RackStorageRepository::class)]
+#[ApiResource(
+    collectionOperations: ['get', 'post'],
+    itemOperations: [
+        'get' => [],
+    ],
+    paginationItemsPerPage: 2,
+    paginationMaximumItemsPerPage: 2
+)]
+#[ApiFilter(SearchFilter::class, properties: ['rack' => 'exact'])]
 class RackStorage
 {
     #[ORM\Id]
