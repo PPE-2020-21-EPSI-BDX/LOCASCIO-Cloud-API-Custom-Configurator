@@ -19,7 +19,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
                 'groups' => ['read:Disk', 'read:Connector'],
                 'enable_max_depth' => true
             ]
-        ]
+        ],
+        'patch' => []
     ],
     paginationItemsPerPage: 2,
     paginationMaximumItemsPerPage: 2
