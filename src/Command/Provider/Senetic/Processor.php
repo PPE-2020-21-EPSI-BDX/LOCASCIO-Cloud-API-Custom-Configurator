@@ -71,7 +71,7 @@ class Processor extends Product
             dump("==========================================================================================");
         } else {
 
-            $this->update($product);
+            $this->update($product, $_SERVER['APP_HOST'] . '/api/processors/' . $this->productInDB['id']);
 
         }
     }
@@ -83,7 +83,7 @@ class Processor extends Product
     private function socket(): ?string
     {
         if (isset($this->detail['Socket de processeur (réceptable de processeur)'])) {
-            return $this->format->removeSpaces($this->detail['Socket de processeur (réceptable de processeur)']);
+            return ($this->detail['Socket de processeur (réceptable de processeur)']);
         }
         return null;
     }
@@ -95,7 +95,7 @@ class Processor extends Product
     private function maxProcessors(): ?string
     {
         if (isset($this->detail['Configuration CPU (max)'])) {
-            return $this->format->removeSpaces($this->detail['Configuration CPU (max)']);
+            return ($this->detail['Configuration CPU (max)']);
         }
         return $this->upi();
     }
@@ -107,7 +107,7 @@ class Processor extends Product
     private function upi(): ?string
     {
         if (isset($this->detail['Nombre de liaisons UPI'])) {
-            return $this->format->removeSpaces($this->detail['Nombre de liaisons UPI']);
+            return ($this->detail['Nombre de liaisons UPI']);
         }
         return null;
     }
@@ -119,7 +119,7 @@ class Processor extends Product
     private function cores(): ?string
     {
         if (isset($this->detail['Nombre de coeurs de processeurs'])) {
-            return $this->format->removeSpaces($this->detail['Nombre de coeurs de processeurs']);
+            return ($this->detail['Nombre de coeurs de processeurs']);
         }
         return null;
     }
@@ -131,7 +131,7 @@ class Processor extends Product
     private function threads(): ?string
     {
         if (isset($this->detail['Nombre de threads du processeur'])) {
-            return $this->format->removeSpaces($this->detail['Nombre de threads du processeur']);
+            return ($this->detail['Nombre de threads du processeur']);
         }
         return null;
     }
@@ -143,7 +143,7 @@ class Processor extends Product
     private function tdp(): ?string
     {
         if (isset($this->detail['Enveloppe thermique (TDP, Thermal Design Power)'])) {
-            return $this->format->removeSpaces($this->detail['Enveloppe thermique (TDP, Thermal Design Power)']);
+            return explode('-', $this->detail['Enveloppe thermique (TDP, Thermal Design Power)'])[0];
         }
         return null;
     }
@@ -155,7 +155,7 @@ class Processor extends Product
     private function baseFeq(): ?string
     {
         if (isset($this->detail['Fréquence de base du processeur'])) {
-            return $this->format->removeSpaces($this->detail['Fréquence de base du processeur']);
+            return explode('-', $this->detail['Fréquence de base du processeur'])[0];
         }
         return null;
     }
@@ -167,7 +167,7 @@ class Processor extends Product
     private function boostFreq(): ?string
     {
         if (isset($this->detail['Fréquence du processeur Turbo'])) {
-            return $this->format->removeSpaces($this->detail['Fréquence du processeur Turbo']);
+            return explode('-', $this->detail['Fréquence du processeur Turbo'])[0];
         }
         return null;
     }
@@ -179,7 +179,7 @@ class Processor extends Product
     private function cache(): ?string
     {
         if (isset($this->detail['Mémoire cache du processeur'])) {
-            return $this->format->removeSpaces($this->detail['Mémoire cache du processeur']);
+            return explode('-', $this->detail['Mémoire cache du processeur'])[0];
         }
         return null;
     }
@@ -191,7 +191,7 @@ class Processor extends Product
     private function maxMemCapacity(): ?string
     {
         if (isset($this->detail['Mémoire interne maximum prise en charge par le processeur'])) {
-            return $this->format->removeSpaces($this->detail['Mémoire interne maximum prise en charge par le processeur']);
+            return explode('-', $this->detail['Mémoire interne maximum prise en charge par le processeur'])[0];
         }
         return null;
     }
@@ -204,8 +204,7 @@ class Processor extends Product
     {
         if (isset($this->detail["Vitesses d'horloge de mémoire prises en charge par le processeur"])) {
             $element = $this->detail["Vitesses d'horloge de mémoire prises en charge par le processeur"];
-            $explode = explode(',', $element);
-            return (count($explode) > 1) ? $this->format->removeSpaces(end($explode)) : $element;
+            return explode('-', $element)[0];
         }
         return null;
     }
@@ -217,9 +216,9 @@ class Processor extends Product
     private function memType(): ?string
     {
         if (isset($this->detail['Types de mémoires pris en charge par le processeur'])) {
-            return $this->format->removeSpaces($this->detail['Types de mémoires pris en charge par le processeur']);
+            return ($this->detail['Types de mémoires pris en charge par le processeur']);
         } elseif (isset($this->detail['Type de mémoire interne'])) {
-            return $this->format->removeSpaces($this->detail['Type de mémoire interne']);
+            return ($this->detail['Type de mémoire interne']);
         }
         return null;
     }
