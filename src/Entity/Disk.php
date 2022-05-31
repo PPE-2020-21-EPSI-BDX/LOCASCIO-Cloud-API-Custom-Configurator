@@ -40,9 +40,9 @@ class Disk
     #[Groups(['read:Disk'])]
     private ?string $brand;
 
-    #[ORM\Column(type: 'string', length: 10)]
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
     #[Groups(['read:Disk'])]
-    private string $capacity;
+    private ?string $capacity;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
     #[Groups(['read:Disk'])]
@@ -108,18 +108,6 @@ class Disk
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getCapacity(): ?string
-    {
-        return $this->capacity;
-    }
-
-    public function setCapacity(string $capacity): self
-    {
-        $this->capacity = $capacity;
 
         return $this;
     }
@@ -288,6 +276,18 @@ class Disk
     public function setInterface(?Connector $interface): self
     {
         $this->interface = $interface;
+
+        return $this;
+    }
+
+    public function getCapacity(): ?string
+    {
+        return $this->capacity;
+    }
+
+    public function setCapacity(?string $capacity): self
+    {
+        $this->capacity = $capacity;
 
         return $this;
     }
