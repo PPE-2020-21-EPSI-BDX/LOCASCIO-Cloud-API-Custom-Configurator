@@ -59,9 +59,6 @@ class Motherboard
     #[Groups(['read:Motherboard'])]
     private ?float $price;
 
-    #[ORM\ManyToOne(targetEntity: FormFactor::class)]
-    private ?FormFactor $form_factor;
-
     #[ORM\Column(type: 'integer')]
     private int $tpm;
 
@@ -79,6 +76,9 @@ class Motherboard
 
     #[ORM\ManyToMany(targetEntity: Processor::class)]
     private $processors;
+
+    #[ORM\ManyToOne(targetEntity: FormFactor::class)]
+    private $form_factor;
 
     #[Pure] public function __construct()
     {
@@ -160,18 +160,6 @@ class Motherboard
     public function setPrice(?float $price): self
     {
         $this->price = $price;
-
-        return $this;
-    }
-
-    public function getFormFactor(): ?FormFactor
-    {
-        return $this->form_factor;
-    }
-
-    public function setFormFactor(?FormFactor $form_factor): self
-    {
-        $this->form_factor = $form_factor;
 
         return $this;
     }
@@ -268,6 +256,18 @@ class Motherboard
     public function removeProcessor(Processor $processor): self
     {
         $this->processors->removeElement($processor);
+
+        return $this;
+    }
+
+    public function getFormFactor(): ?FormFactor
+    {
+        return $this->form_factor;
+    }
+
+    public function setFormFactor(?FormFactor $form_factor): self
+    {
+        $this->form_factor = $form_factor;
 
         return $this;
     }
