@@ -14,20 +14,29 @@ class RackStorage
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: Rack::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
-    private Rack $rack;
+    private ?Rack $rack;
 
     #[ORM\ManyToOne(targetEntity: FormFactor::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
-    private Formfactor $disk_form_factor;
+    private ?FormFactor $disk_form_factor;
 
     #[ORM\ManyToOne(targetEntity: Connector::class)]
-    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
-    private Connector $storage_connector;
+    private ?Connector $storage_connector;
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getRack(): ?Rack
+    {
+        return $this->rack;
+    }
+
+    public function setRack(?Rack $rack): self
+    {
+        $this->rack = $rack;
+
+        return $this;
     }
 
     public function getDiskFormFactor(): ?FormFactor
@@ -54,15 +63,4 @@ class RackStorage
         return $this;
     }
 
-    public function getRack(): ?Rack
-    {
-        return $this->rack;
-    }
-
-    public function setRack(?Rack $rack): self
-    {
-        $this->rack = $rack;
-
-        return $this;
-    }
 }
