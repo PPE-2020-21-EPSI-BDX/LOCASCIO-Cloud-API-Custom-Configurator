@@ -29,7 +29,7 @@ class Product
     protected array $detail;
     private array $specLabel;
     private array $specValue;
-    private array $oldProduct;
+    protected array $productInDB;
 
     protected function __construct()
     {
@@ -41,7 +41,7 @@ class Product
         $this->specLabel = [];
         $this->specValue = [];
         $this->detail = [];
-        $this->oldProduct = [];
+        $this->productInDB = [];
     }
 
     /**
@@ -106,13 +106,14 @@ class Product
     {
         $product->filter('td.spec-label')->each(function ($element) {
             if ($element->count() != 0) {
+                $temp = preg_replace('/\B\s/', '', $this->format->removeSpaces($element->text()));
                 $this->specLabel[] = $element->text();
             }
         });
 
         $product->filter('td.spec-value')->each(function ($element) {
             if ($element->count() != 0) {
-                $this->specValue[] = $element->text();
+                $this->specValue[] = $this->format->removeSpaces($element->text());
             }
         });
 
@@ -151,7 +152,7 @@ class Product
 
         $data = $response->toArray();
 
-        $this->oldProduct = ($data['hydra:totalItems'] > 0) ? $data['hydra:member'][0] : [];
+        $this->productInDB = ($data['hydra:totalItems'] > 0) ? $data['hydra:member'][0] : [];
 
         return !(($data['hydra:totalItems'] > 0));
     }
@@ -161,7 +162,7 @@ class Product
      * @throws Exception
      * @throws TransportExceptionInterface
      */
-    protected function update(Crawler $product): bool
+    protected function update(Crawler $product, string $url): bool
     {
         $temp = new stdclass;
 
@@ -169,22 +170,22 @@ class Product
         $new_price = floatval($this->price($product));
         $new_availability = intval($this->availability($product));
 
-        if (isset($this->oldProduct['delivery'])) {
-            $old_date = new DateTime($this->oldProduct['delivery']);
+        if (isset($this->productInDB['delivery'])) {
+            $old_date = new DateTime($this->productInDB['delivery']);
             $temp->delivery = ($new_date > $old_date) ? $new_date->format('Y-m-d') : (($old_date > $new_date) ? $old_date->format('Y-m-d') : null);
         } else {
             $temp->delivery = $new_date->format('Y-m-d');
         }
 
-        if (isset($this->oldProduct['price'])) {
-            $old_price = floatval($this->oldProduct['price']);
+        if (isset($this->productInDB['price'])) {
+            $old_price = floatval($this->productInDB['price']);
             $temp->price = ($new_price > $old_price) ? $new_price : (($old_price > $new_price) ? $old_price : null);
         } else {
             $temp->price = $new_price;
         }
 
-        if (isset($this->oldProduct['availability'])) {
-            $old_availability = intval($this->oldProduct['availability']);
+        if (isset($this->productInDB['availability'])) {
+            $old_availability = intval($this->productInDB['availability']);
             $temp->availability = ($new_availability > $old_availability) ? $new_availability : (($old_availability > $new_availability) ? $old_availability : null);
         } else {
             $temp->availability = $new_availability;
@@ -207,7 +208,7 @@ class Product
 
             $httpClient = HttpClient::create();
 
-            $response = $httpClient->request('PATCH', $_SERVER['APP_HOST'] . '/api/processors/' . $this->oldProduct['id'], [
+            $response = $httpClient->request('PATCH', $url, [
                 'headers' => ['accept' => 'application/ld+json', 'Content-Type' => 'application/merge-patch+json'],
                 'json' => $temp,
             ]);
