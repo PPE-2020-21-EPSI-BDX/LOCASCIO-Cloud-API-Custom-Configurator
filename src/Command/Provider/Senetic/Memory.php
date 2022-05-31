@@ -63,9 +63,7 @@ class Memory extends Product
             dump('    SUCCESS - Insert ' . $this->getName($product) . ' in DB !');
             dump("==========================================================================================");
         } else {
-
-            $this->update($product);
-
+            $this->update($product, $_SERVER['APP_HOST'] . '/api/memories/' . $this->productInDB['id']);
         }
     }
 
@@ -75,7 +73,7 @@ class Memory extends Product
      */
     private function capacity(): ?string
     {
-        return (isset($this->detail['Mémoire interne'])) ? $this->format->removeSpaces($this->detail['Mémoire interne']) : null;
+        return (isset($this->detail['Mémoire interne'])) ? explode('-', $this->detail['Mémoire interne'])[0] : null;
     }
 
     /**
@@ -84,13 +82,13 @@ class Memory extends Product
      */
     private function cas(): ?string
     {
-        return (isset($this->detail['Latence CAS'])) ? $this->format->removeSpaces($this->detail['Latence CAS']) : null;
+        return (isset($this->detail['Latence CAS'])) ? ($this->detail['Latence CAS']) : null;
     }
 
     private function number(): ?int
     {
         if (isset($this->detail['Disposition de la mémoire (modules x dimensions)'])) {
-            return intval($this->format->removeSpaces(explode('x', $this->detail['Disposition de la mémoire (modules x dimensions)'])[0]));
+            return intval((explode('x', $this->detail['Disposition de la mémoire (modules x dimensions)'])[0]));
         } else {
             return null;
         }
@@ -102,7 +100,7 @@ class Memory extends Product
      */
     private function type(): ?string
     {
-        return (isset($this->detail['Type de mémoire interne'])) ? $this->format->removeSpaces($this->detail['Type de mémoire interne']) : null;
+        return (isset($this->detail['Type de mémoire interne'])) ? ($this->detail['Type de mémoire interne']) : null;
     }
 
     /**
@@ -111,7 +109,7 @@ class Memory extends Product
      */
     private function freq(): ?string
     {
-        return (isset($this->detail['Fréquence de la mémoire'])) ? $this->format->removeSpaces($this->detail['Fréquence de la mémoire']) : null;
+        return (isset($this->detail['Fréquence de la mémoire'])) ? explode('-', $this->detail['Fréquence de la mémoire'])[0] : null;
     }
 
     /**
@@ -130,6 +128,8 @@ class Memory extends Product
      */
     private function slotType(): ?string
     {
-        return isset($this->detail['Support de mémoire']) ? $this->format->removeSpaces(explode(' ', $this->detail['Support de mémoire'])[1]) : null;
+        return (isset($this->detail['Support de mémoire']))
+            ? $this->detail['Support de mémoire']
+            : null;
     }
 }
