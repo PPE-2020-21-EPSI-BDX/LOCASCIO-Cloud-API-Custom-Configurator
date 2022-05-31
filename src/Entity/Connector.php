@@ -34,7 +34,7 @@ class Connector
     private string $name;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $max_transfer_speed;
+    private ?string $max_transfer_speed;
 
     public function getId(): ?int
     {

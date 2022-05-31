@@ -93,7 +93,7 @@ class Disk
 
     #[ORM\ManyToOne(targetEntity: Connector::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private $interface;
+    private ?Connector $interface;
 
     public function getId(): ?int
     {
