@@ -14,7 +14,7 @@ class Format
      */
     public function convertLetterChannelToInt(string $search): ?int
     {
-        $new = $this->removeSpaces($search);
+        $new = preg_replace('/\W-/', '', $search);
         $ref = [
             'Dual-channel' => 2,
             'Quad-channel' => 4,
@@ -22,11 +22,7 @@ class Format
             'Hepta-channel' => 7,
             'Octa-channel' => 8
         ];
-        if (isset($ref[$new])){
-            return $ref[$new];
-        }else{
-            return null;
-        }
+        return $ref[$new] ?? null;
     }
 
     /**
@@ -37,7 +33,7 @@ class Format
     public function convertYesNoToBool(string $search): ?int
 
     {
-        $new = $this->removeSpaces($search);
+        $new = preg_replace('/\W/', '', $search);
         $ref = [
             'Oui' => 1,
             'Non' => 0
@@ -48,29 +44,25 @@ class Format
         return null;
     }
 
-    /**
-     * Allows deleting spaces at the end of string
-     * @param String $string
-     * @return string
-     */
     public function removeSpaces(String $string): string
     {
-        // Let's check if there are spaces in the string
-        if (preg_match_all('/\s+/', $string) != 0){
+        setlocale(LC_ALL, 'fr_FR@euro');
+        $string = utf8_decode($string);
 
-            // Instruction to delete spaces
-            $temp = [];
-            $string = $this->removeAccents($string);
-            $arr1 = preg_split('/[^a-zA-Z_0-9().,-]+/', $string);
+        // Spaces are identified with characters at the beginning and end
+        preg_match_all('/\w\s\w/', $string, $spaceWithLetter);
 
-            foreach ($arr1 as $element) {
-                (preg_match('/[a-zA-Z_0-9().,-]+/', $element) == 1) ? array_push($temp, $element) : false;
-            }
-
-            return implode(' ', array_unique($temp));
+        foreach ($spaceWithLetter as $element) {
+            $string = str_replace($element, preg_replace('/\s/', '-', $element), $string);
         }
 
-        return $string;
+        // We delete all spaces in the string
+        preg_match_all('/\s/', $string, $output);
+        foreach ($output[0] as $element) {
+            $string = str_replace($element, '', $string);
+        }
+
+        return utf8_encode($string);
     }
 
     /**
@@ -82,26 +74,6 @@ class Format
     {
         $new_val = explode(' ', $this->removeSpaces($availability))[0];
         return (str_contains($new_val, '-')) ? intval(explode('-', $new_val)[0]) : intval($new_val);
-    }
-
-    /**
-     * Allows to convert an accent into a letter
-     * @param String $word
-     * @return array|string
-     */
-    private function removeAccents(string $word): array|string
-    {
-        $word = str_replace('à', 'a', $word);
-        $word = str_replace('â', 'a', $word);
-        $word = str_replace('é', 'e', $word);
-        $word = str_replace('è', 'e', $word);
-        $word = str_replace('ê', 'e', $word);
-        $word = str_replace('ë', 'e', $word);
-        $word = str_replace('î', 'i', $word);
-        $word = str_replace('ï', 'i', $word);
-        $word = str_replace('ô', 'o', $word);
-        $word = str_replace('ù', 'u', $word);
-        return str_replace('û', 'u', $word);
     }
 
     /**
