@@ -2,10 +2,22 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\RackIndicatorRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RackIndicatorRepository::class)]
+#[ApiResource(
+    collectionOperations: ['get', 'post'],
+    itemOperations: [
+        'get' => [],
+    ],
+    paginationItemsPerPage: 1,
+    paginationMaximumItemsPerPage: 1
+)]
+#[ApiFilter(SearchFilter::class, properties: ['rack' => 'exact'])]
 class RackIndicator
 {
     #[ORM\Id]
@@ -14,19 +26,19 @@ class RackIndicator
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: Rack::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     private Rack $rack;
 
     #[ORM\ManyToOne(targetEntity: Indicator::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    private Indicator $indicator;
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    private ?Indicator $indicator;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getRack(): Rack
+    public function getRack(): ?Rack
     {
         return $this->rack;
     }
