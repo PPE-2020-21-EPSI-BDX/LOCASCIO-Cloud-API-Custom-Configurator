@@ -93,8 +93,8 @@ class Disk
     private ?FormFactor $form_factor;
 
     #[ORM\ManyToOne(targetEntity: Connector::class)]
-    #[ORM\JoinColumn(nullable: false)]
     private ?Connector $interface;
+
 
     public function getId(): ?int
     {
@@ -269,18 +269,6 @@ class Disk
         return $this;
     }
 
-    public function getInterface(): ?Connector
-    {
-        return $this->interface;
-    }
-
-    public function setInterface(?Connector $interface): self
-    {
-        $this->interface = $interface;
-
-        return $this;
-    }
-
     public function getCapacity(): ?string
     {
         return $this->capacity;
@@ -289,6 +277,18 @@ class Disk
     public function setCapacity(?string $capacity): self
     {
         $this->capacity = $capacity;
+
+        return $this;
+    }
+
+    public function getInterface(): ?Connector
+    {
+        return $this->interface;
+    }
+
+    public function setInterface(?Connector $interface): self
+    {
+        $this->interface = $interface;
 
         return $this;
     }

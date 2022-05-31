@@ -32,12 +32,13 @@ class Disk extends RelationTable
         if ($this->checkExist($_SERVER['APP_HOST'] . '/api/disks?provider_reference=' . $this->providerReference($product))) {
 
             $httpClient = HttpClient::create();
+            $formFactor = $this->getFormFactor();
 
             $response = $httpClient->request('POST', $_SERVER['APP_HOST'] . '/api/disks', [
                 'headers' => ['Content-Type' => 'application/ld+json'],
                 'json' => [
                     "interface" => $this->getInterface()["@id"],
-                    "formFactor" => $this->getFormFactor()["@id"],
+                    "formFactor" => !is_null($formFactor) ? $formFactor["@id"] : null,
                     "name" => $this->getName($product),
                     "brand" => $this->getBrand($product),
                     "capacity" => $this->capacity(),
@@ -65,9 +66,7 @@ class Disk extends RelationTable
             dump('    SUCCESS - Insert ' . $this->getName($product) . ' in DB !');
             dump("==========================================================================================");
         } else {
-
-            //$this->update($product);
-
+            $this->update($product, $_SERVER['APP_HOST'] . '/api/disks/' . $this->productInDB['id']);
         }
     }
 
@@ -105,14 +104,13 @@ class Disk extends RelationTable
 
     /**
      * Allows to get or insert the disk form factor
-     * @return array
      * @throws ClientExceptionInterface
      * @throws DecodingExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    private function getFormFactor(): array
+    private function getFormFactor()
     {
         if (isset($this->detail['Facteur de forme SSD'])) {
             $name = preg_replace('/[^\w.]/', '', $this->detail['Facteur de forme SSD']);
