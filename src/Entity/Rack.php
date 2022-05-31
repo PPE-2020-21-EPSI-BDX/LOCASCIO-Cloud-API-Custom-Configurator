@@ -34,11 +34,14 @@ class Rack
     #[ORM\Column(type: 'string', length: 255)]
     private string $name;
 
-    #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private ?string $brand;
+    #[ORM\Column(type: 'string', length: 10, nullable: true)]
+    private ?string $type;
+
+    #[ORM\Column(type: 'string', length: 50)]
+    private string $brand;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private string $picture;
+    private ?string $picture;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $width;
@@ -46,6 +49,8 @@ class Rack
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $depth;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $height;
 
     #[ORM\Column(type: 'float', nullable: true)]
     private ?float $weight;
@@ -56,7 +61,7 @@ class Rack
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?DateTimeInterface $delivery;
 
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(type: 'string', length: 25)]
     private string $provider_reference;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -64,12 +69,6 @@ class Rack
 
     #[ORM\Column(type: 'float', nullable: true)]
     private ?float $price;
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private $height;
-
-    #[ORM\Column(type: 'string', length: 10, nullable: true)]
-    private $type;
 
     public function getId(): ?int
     {
@@ -88,6 +87,18 @@ class Rack
         return $this;
     }
 
+    public function getBrand(): ?string
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(string $brand): self
+    {
+        $this->brand = $brand;
+
+        return $this;
+    }
+
     public function getPicture(): ?string
     {
         return $this->picture;
@@ -100,6 +111,54 @@ class Rack
         return $this;
     }
 
+    public function getWidth(): ?int
+    {
+        return $this->width;
+    }
+
+    public function setWidth(?int $width): self
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    public function getDepth(): ?int
+    {
+        return $this->depth;
+    }
+
+    public function setDepth(?int $depth): self
+    {
+        $this->depth = $depth;
+
+        return $this;
+    }
+
+    public function getHeight(): ?int
+    {
+        return $this->height;
+    }
+
+    public function setHeight(?int $height): self
+    {
+        $this->height = $height;
+
+        return $this;
+    }
+
+    public function getWeight(): ?float
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(?float $weight): self
+    {
+        $this->weight = $weight;
+
+        return $this;
+    }
+
     public function getAvailability(): ?int
     {
         return $this->availability;
@@ -108,6 +167,18 @@ class Rack
     public function setAvailability(?int $availability): self
     {
         $this->availability = $availability;
+
+        return $this;
+    }
+
+    public function getDelivery(): ?DateTimeInterface
+    {
+        return $this->delivery;
+    }
+
+    public function setDelivery(?DateTimeInterface $delivery): self
+    {
+        $this->delivery = $delivery;
 
         return $this;
     }
@@ -141,81 +212,9 @@ class Rack
         return $this->price;
     }
 
-    public function setPrice(float $price): self
+    public function setPrice(?float $price): self
     {
         $this->price = $price;
-
-        return $this;
-    }
-
-    public function getDelivery(): ?DateTimeInterface
-    {
-        return $this->delivery;
-    }
-
-    public function setDelivery(?DateTimeInterface $delivery): self
-    {
-        $this->delivery = $delivery;
-
-        return $this;
-    }
-
-    public function getBrand(): ?string
-    {
-        return $this->brand;
-    }
-
-    public function setBrand(?string $brand): self
-    {
-        $this->brand = $brand;
-
-        return $this;
-    }
-
-    public function getWidth(): ?int
-    {
-        return $this->width;
-    }
-
-    public function setWidth(?int $width): self
-    {
-        $this->width = $width;
-
-        return $this;
-    }
-
-    public function getDepth(): ?int
-    {
-        return $this->depth;
-    }
-
-    public function setDepth(?int $depth): self
-    {
-        $this->depth = $depth;
-
-        return $this;
-    }
-
-    public function getWeight(): ?float
-    {
-        return $this->weight;
-    }
-
-    public function setWeight(?float $weight): self
-    {
-        $this->weight = $weight;
-
-        return $this;
-    }
-
-    public function getHeight(): ?int
-    {
-        return $this->height;
-    }
-
-    public function setHeight(?int $height): self
-    {
-        $this->height = $height;
 
         return $this;
     }
