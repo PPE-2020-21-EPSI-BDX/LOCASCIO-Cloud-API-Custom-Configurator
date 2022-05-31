@@ -70,6 +70,9 @@ class Rack
     #[ORM\Column(type: 'float', nullable: true)]
     private ?float $price;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $storageBays;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -227,6 +230,18 @@ class Rack
     public function setType(?string $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getStorageBays(): ?int
+    {
+        return $this->storageBays;
+    }
+
+    public function setStorageBays(?int $storageBays): self
+    {
+        $this->storageBays = $storageBays;
 
         return $this;
     }

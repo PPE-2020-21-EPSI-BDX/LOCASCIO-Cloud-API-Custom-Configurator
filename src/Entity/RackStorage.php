@@ -26,12 +26,15 @@ class RackStorage
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: Rack::class)]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?Rack $rack;
 
     #[ORM\ManyToOne(targetEntity: FormFactor::class)]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?FormFactor $disk_form_factor;
 
     #[ORM\ManyToOne(targetEntity: Connector::class)]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?Connector $storage_connector;
 
     public function getId(): ?int

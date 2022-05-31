@@ -26,28 +26,17 @@ class RackFormFactor
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: Rack::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     private Rack $rack;
 
     #[ORM\ManyToOne(targetEntity: FormFactor::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    private FormFactor $rack_unit;
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    private ?FormFactor $rack_unit;
+
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getRackUnit(): ?FormFactor
-    {
-        return $this->rack_unit;
-    }
-
-    public function setRackUnit(?FormFactor $rack_unit): self
-    {
-        $this->rack_unit = $rack_unit;
-
-        return $this;
     }
 
     public function getRack(): ?Rack
@@ -58,6 +47,18 @@ class RackFormFactor
     public function setRack(?Rack $rack): self
     {
         $this->rack = $rack;
+
+        return $this;
+    }
+
+    public function getRackUnit(): ?FormFactor
+    {
+        return $this->rack_unit;
+    }
+
+    public function setRackUnit(?FormFactor $rack_unit): self
+    {
+        $this->rack_unit = $rack_unit;
 
         return $this;
     }
