@@ -7,10 +7,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\MotherboardRepository;
 use DateTimeInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MotherboardRepository::class)]
@@ -59,33 +56,15 @@ class Motherboard
     #[Groups(['read:Motherboard'])]
     private ?float $price;
 
-    #[ORM\Column(type: 'integer')]
-    private int $tpm;
-
-    #[ORM\ManyToMany(targetEntity: Connector::class)]
-    #[ORM\JoinTable("motherboard_interface")]
-    #[Groups(['read:Connector'])]
-    private ArrayCollection $output;
-
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['read:Motherboard'])]
     private ?int $availability;
 
-    #[ORM\ManyToMany(targetEntity: Memory::class)]
-    private $memories;
-
-    #[ORM\ManyToMany(targetEntity: Processor::class)]
-    private $processors;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $tpm;
 
     #[ORM\ManyToOne(targetEntity: FormFactor::class)]
     private $form_factor;
-
-    #[Pure] public function __construct()
-    {
-        $this->output = new ArrayCollection();
-        $this->memories = new ArrayCollection();
-        $this->processors = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -164,42 +143,6 @@ class Motherboard
         return $this;
     }
 
-    public function getTpm(): ?int
-    {
-        return $this->tpm;
-    }
-
-    public function setTpm(int $tpm): self
-    {
-        $this->tpm = $tpm;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Connector>
-     */
-    public function getOutput(): Collection
-    {
-        return $this->output;
-    }
-
-    public function addOutput(Connector $output): self
-    {
-        if (!$this->output->contains($output)) {
-            $this->output[] = $output;
-        }
-
-        return $this;
-    }
-
-    public function removeOutput(Connector $output): self
-    {
-        $this->output->removeElement($output);
-
-        return $this;
-    }
-
     public function getAvailability(): ?int
     {
         return $this->availability;
@@ -212,50 +155,14 @@ class Motherboard
         return $this;
     }
 
-    /**
-     * @return Collection<int, Memory>
-     */
-    public function getMemories(): Collection
+    public function getTpm(): ?int
     {
-        return $this->memories;
+        return $this->tpm;
     }
 
-    public function addMemory(Memory $memory): self
+    public function setTpm(?int $tpm): self
     {
-        if (!$this->memories->contains($memory)) {
-            $this->memories[] = $memory;
-        }
-
-        return $this;
-    }
-
-    public function removeMemory(Memory $memory): self
-    {
-        $this->memories->removeElement($memory);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Processor>
-     */
-    public function getProcessors(): Collection
-    {
-        return $this->processors;
-    }
-
-    public function addProcessor(Processor $processor): self
-    {
-        if (!$this->processors->contains($processor)) {
-            $this->processors[] = $processor;
-        }
-
-        return $this;
-    }
-
-    public function removeProcessor(Processor $processor): self
-    {
-        $this->processors->removeElement($processor);
+        $this->tpm = $tpm;
 
         return $this;
     }

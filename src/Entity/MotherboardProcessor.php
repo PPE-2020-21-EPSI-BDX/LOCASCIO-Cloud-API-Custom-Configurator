@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\MotherboardProcessorRepository;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: MotherboardProcessorRepository::class)]
+class MotherboardProcessor
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private $id;
+
+    #[ORM\ManyToOne(targetEntity: Motherboard::class)]
+    private $motherboard;
+
+    #[ORM\ManyToOne(targetEntity: Processor::class)]
+    private $processor;
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getMotherboard(): ?Motherboard
+    {
+        return $this->motherboard;
+    }
+
+    public function setMotherboard(?Motherboard $motherboard): self
+    {
+        $this->motherboard = $motherboard;
+
+        return $this;
+    }
+
+    public function getProcessor(): ?Processor
+    {
+        return $this->processor;
+    }
+
+    public function setProcessor(?Processor $processor): self
+    {
+        $this->processor = $processor;
+
+        return $this;
+    }
+}
