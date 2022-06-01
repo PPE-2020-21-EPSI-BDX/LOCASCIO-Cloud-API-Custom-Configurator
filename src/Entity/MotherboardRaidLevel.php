@@ -3,15 +3,15 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\MotherboardInterfaceRepository;
+use App\Repository\MotherboardRaidLevelRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: MotherboardInterfaceRepository::class)]
+#[ORM\Entity(repositoryClass: MotherboardRaidLevelRepository::class)]
 #[ApiResource(
     collectionOperations: ['post'],
     itemOperations: []
 )]
-class MotherboardInterface
+class MotherboardRaidLevel
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -22,9 +22,9 @@ class MotherboardInterface
     #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?Motherboard $motherboard;
 
-    #[ORM\ManyToOne(targetEntity: Connector::class)]
+    #[ORM\ManyToOne(targetEntity: Level::class)]
     #[ORM\JoinColumn(onDelete: "CASCADE")]
-    private ?Connector $connector;
+    private ?Level $level;
 
     public function getId(): ?int
     {
@@ -43,14 +43,14 @@ class MotherboardInterface
         return $this;
     }
 
-    public function getConnector(): ?Connector
+    public function getLevel(): ?Level
     {
-        return $this->connector;
+        return $this->level;
     }
 
-    public function setConnector(?Connector $connector): self
+    public function setLevel(?Level $level): self
     {
-        $this->connector = $connector;
+        $this->level = $level;
 
         return $this;
     }

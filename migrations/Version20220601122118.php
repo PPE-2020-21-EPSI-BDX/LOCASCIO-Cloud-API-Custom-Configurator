@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20220601074754 extends AbstractMigration
+final class Version20220601122118 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -30,6 +30,7 @@ final class Version20220601074754 extends AbstractMigration
         $this->addSql('CREATE TABLE motherboard_interface (id INT AUTO_INCREMENT NOT NULL, motherboard_id INT DEFAULT NULL, connector_id INT DEFAULT NULL, INDEX IDX_36DC57AC6511E8A3 (motherboard_id), INDEX IDX_36DC57AC4D085745 (connector_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE motherboard_memory (id INT AUTO_INCREMENT NOT NULL, motherboard_id INT DEFAULT NULL, memory_id INT DEFAULT NULL, INDEX IDX_AF8C44A16511E8A3 (motherboard_id), INDEX IDX_AF8C44A1CCC80CB3 (memory_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE motherboard_processor (id INT AUTO_INCREMENT NOT NULL, motherboard_id INT DEFAULT NULL, processor_id INT DEFAULT NULL, INDEX IDX_2BE8FD216511E8A3 (motherboard_id), INDEX IDX_2BE8FD2137BAC19A (processor_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE motherboard_raid_level (id INT AUTO_INCREMENT NOT NULL, motherboard_id INT DEFAULT NULL, level_id INT DEFAULT NULL, INDEX IDX_6C63936F6511E8A3 (motherboard_id), INDEX IDX_6C63936F5FB14BA7 (level_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE power (id INT AUTO_INCREMENT NOT NULL, capacity INT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE processor (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, brand VARCHAR(100) DEFAULT NULL, delivery DATETIME DEFAULT NULL, provider_reference VARCHAR(50) DEFAULT NULL, socket VARCHAR(50) DEFAULT NULL, upi INT DEFAULT NULL, cores INT DEFAULT NULL, threads INT DEFAULT NULL, tdp VARCHAR(20) DEFAULT NULL, base_freq VARCHAR(50) DEFAULT NULL, boost_freq VARCHAR(50) DEFAULT NULL, cache VARCHAR(50) DEFAULT NULL, max_mem_capacity VARCHAR(50) DEFAULT NULL, max_mem_speed VARCHAR(50) DEFAULT NULL, mem_type VARCHAR(50) DEFAULT NULL, application VARCHAR(50) DEFAULT NULL, url VARCHAR(255) NOT NULL, price DOUBLE PRECISION DEFAULT NULL, ecc TINYINT(1) DEFAULT NULL, grafics_processor TINYINT(1) DEFAULT NULL, availability INT DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE rack (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, type VARCHAR(10) DEFAULT NULL, brand VARCHAR(50) NOT NULL, picture VARCHAR(255) DEFAULT NULL, width INT DEFAULT NULL, depth INT DEFAULT NULL, height INT DEFAULT NULL, weight DOUBLE PRECISION DEFAULT NULL, availability INT DEFAULT NULL, delivery DATETIME DEFAULT NULL, provider_reference VARCHAR(25) NOT NULL, url VARCHAR(255) NOT NULL, price DOUBLE PRECISION DEFAULT NULL, storage_bays INT DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -49,6 +50,8 @@ final class Version20220601074754 extends AbstractMigration
         $this->addSql('ALTER TABLE motherboard_memory ADD CONSTRAINT FK_AF8C44A1CCC80CB3 FOREIGN KEY (memory_id) REFERENCES memory (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE motherboard_processor ADD CONSTRAINT FK_2BE8FD216511E8A3 FOREIGN KEY (motherboard_id) REFERENCES motherboard (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE motherboard_processor ADD CONSTRAINT FK_2BE8FD2137BAC19A FOREIGN KEY (processor_id) REFERENCES processor (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE motherboard_raid_level ADD CONSTRAINT FK_6C63936F6511E8A3 FOREIGN KEY (motherboard_id) REFERENCES motherboard (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE motherboard_raid_level ADD CONSTRAINT FK_6C63936F5FB14BA7 FOREIGN KEY (level_id) REFERENCES level (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE rack_form_factor ADD CONSTRAINT FK_9C80C0148E86A33E FOREIGN KEY (rack_id) REFERENCES rack (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE rack_form_factor ADD CONSTRAINT FK_9C80C0142FCF7EEF FOREIGN KEY (rack_unit_id) REFERENCES form_factor (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE rack_indicator ADD CONSTRAINT FK_5AC4F6A88E86A33E FOREIGN KEY (rack_id) REFERENCES rack (id) ON DELETE CASCADE');
@@ -78,11 +81,13 @@ final class Version20220601074754 extends AbstractMigration
         $this->addSql('ALTER TABLE rack_form_factor DROP FOREIGN KEY FK_9C80C0142FCF7EEF');
         $this->addSql('ALTER TABLE rack_storage DROP FOREIGN KEY FK_830815D6D5B29D06');
         $this->addSql('ALTER TABLE rack_indicator DROP FOREIGN KEY FK_5AC4F6A84402854A');
+        $this->addSql('ALTER TABLE motherboard_raid_level DROP FOREIGN KEY FK_6C63936F5FB14BA7');
         $this->addSql('ALTER TABLE raid_card_level DROP FOREIGN KEY FK_60FBFD055FB14BA7');
         $this->addSql('ALTER TABLE motherboard_memory DROP FOREIGN KEY FK_AF8C44A1CCC80CB3');
         $this->addSql('ALTER TABLE motherboard_interface DROP FOREIGN KEY FK_36DC57AC6511E8A3');
         $this->addSql('ALTER TABLE motherboard_memory DROP FOREIGN KEY FK_AF8C44A16511E8A3');
         $this->addSql('ALTER TABLE motherboard_processor DROP FOREIGN KEY FK_2BE8FD216511E8A3');
+        $this->addSql('ALTER TABLE motherboard_raid_level DROP FOREIGN KEY FK_6C63936F6511E8A3');
         $this->addSql('ALTER TABLE rack_power DROP FOREIGN KEY FK_1D8B5BECAB4FC384');
         $this->addSql('ALTER TABLE motherboard_processor DROP FOREIGN KEY FK_2BE8FD2137BAC19A');
         $this->addSql('ALTER TABLE rack_form_factor DROP FOREIGN KEY FK_9C80C0148E86A33E');
@@ -101,6 +106,7 @@ final class Version20220601074754 extends AbstractMigration
         $this->addSql('DROP TABLE motherboard_interface');
         $this->addSql('DROP TABLE motherboard_memory');
         $this->addSql('DROP TABLE motherboard_processor');
+        $this->addSql('DROP TABLE motherboard_raid_level');
         $this->addSql('DROP TABLE power');
         $this->addSql('DROP TABLE processor');
         $this->addSql('DROP TABLE rack');
