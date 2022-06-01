@@ -11,13 +11,15 @@ class MotherboardInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private int $id;
 
     #[ORM\ManyToOne(targetEntity: Motherboard::class)]
-    private $motherboard;
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    private ?Motherboard $motherboard;
 
     #[ORM\ManyToOne(targetEntity: Connector::class)]
-    private $connector;
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    private ?Connector $connector;
 
     public function getId(): ?int
     {

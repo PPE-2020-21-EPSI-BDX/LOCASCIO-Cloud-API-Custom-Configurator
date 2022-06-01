@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20220601073145 extends AbstractMigration
+final class Version20220601074754 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -43,12 +43,12 @@ final class Version20220601073145 extends AbstractMigration
         $this->addSql('ALTER TABLE disk ADD CONSTRAINT FK_C74DD02CD887EAF FOREIGN KEY (form_factor_id) REFERENCES form_factor (id)');
         $this->addSql('ALTER TABLE disk ADD CONSTRAINT FK_C74DD02AB0BE982 FOREIGN KEY (interface_id) REFERENCES connector (id)');
         $this->addSql('ALTER TABLE motherboard ADD CONSTRAINT FK_7F7A0F2BCD887EAF FOREIGN KEY (form_factor_id) REFERENCES form_factor (id)');
-        $this->addSql('ALTER TABLE motherboard_interface ADD CONSTRAINT FK_36DC57AC6511E8A3 FOREIGN KEY (motherboard_id) REFERENCES motherboard (id)');
-        $this->addSql('ALTER TABLE motherboard_interface ADD CONSTRAINT FK_36DC57AC4D085745 FOREIGN KEY (connector_id) REFERENCES connector (id)');
-        $this->addSql('ALTER TABLE motherboard_memory ADD CONSTRAINT FK_AF8C44A16511E8A3 FOREIGN KEY (motherboard_id) REFERENCES motherboard (id)');
-        $this->addSql('ALTER TABLE motherboard_memory ADD CONSTRAINT FK_AF8C44A1CCC80CB3 FOREIGN KEY (memory_id) REFERENCES memory (id)');
-        $this->addSql('ALTER TABLE motherboard_processor ADD CONSTRAINT FK_2BE8FD216511E8A3 FOREIGN KEY (motherboard_id) REFERENCES motherboard (id)');
-        $this->addSql('ALTER TABLE motherboard_processor ADD CONSTRAINT FK_2BE8FD2137BAC19A FOREIGN KEY (processor_id) REFERENCES processor (id)');
+        $this->addSql('ALTER TABLE motherboard_interface ADD CONSTRAINT FK_36DC57AC6511E8A3 FOREIGN KEY (motherboard_id) REFERENCES motherboard (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE motherboard_interface ADD CONSTRAINT FK_36DC57AC4D085745 FOREIGN KEY (connector_id) REFERENCES connector (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE motherboard_memory ADD CONSTRAINT FK_AF8C44A16511E8A3 FOREIGN KEY (motherboard_id) REFERENCES motherboard (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE motherboard_memory ADD CONSTRAINT FK_AF8C44A1CCC80CB3 FOREIGN KEY (memory_id) REFERENCES memory (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE motherboard_processor ADD CONSTRAINT FK_2BE8FD216511E8A3 FOREIGN KEY (motherboard_id) REFERENCES motherboard (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE motherboard_processor ADD CONSTRAINT FK_2BE8FD2137BAC19A FOREIGN KEY (processor_id) REFERENCES processor (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE rack_form_factor ADD CONSTRAINT FK_9C80C0148E86A33E FOREIGN KEY (rack_id) REFERENCES rack (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE rack_form_factor ADD CONSTRAINT FK_9C80C0142FCF7EEF FOREIGN KEY (rack_unit_id) REFERENCES form_factor (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE rack_indicator ADD CONSTRAINT FK_5AC4F6A88E86A33E FOREIGN KEY (rack_id) REFERENCES rack (id) ON DELETE CASCADE');

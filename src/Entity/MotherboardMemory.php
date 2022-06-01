@@ -11,13 +11,15 @@ class MotherboardMemory
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private int $id;
 
     #[ORM\ManyToOne(targetEntity: Motherboard::class)]
-    private $motherboard;
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    private ?Motherboard $motherboard;
 
     #[ORM\ManyToOne(targetEntity: Memory::class)]
-    private $memory;
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    private ?Memory $memory;
 
     public function getId(): ?int
     {

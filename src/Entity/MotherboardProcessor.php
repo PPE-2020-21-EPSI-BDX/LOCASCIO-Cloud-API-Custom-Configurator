@@ -11,13 +11,15 @@ class MotherboardProcessor
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private int $id;
 
     #[ORM\ManyToOne(targetEntity: Motherboard::class)]
-    private $motherboard;
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    private ?Motherboard $motherboard;
 
     #[ORM\ManyToOne(targetEntity: Processor::class)]
-    private $processor;
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    private ?Processor $processor;
 
     public function getId(): ?int
     {
