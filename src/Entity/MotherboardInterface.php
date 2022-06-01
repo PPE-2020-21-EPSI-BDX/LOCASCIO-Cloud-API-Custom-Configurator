@@ -2,10 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\MotherboardInterfaceRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MotherboardInterfaceRepository::class)]
+#[ApiResource(
+    collectionOperations: ['post'],
+)]
 class MotherboardInterface
 {
     #[ORM\Id]
