@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ],
     ]
 )]
-#[ApiFilter(SearchFilter::class, properties: ['name' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'exact', 'max_transfer_speed' => 'exact'])]
 class Connector
 {
     #[ORM\Id]
