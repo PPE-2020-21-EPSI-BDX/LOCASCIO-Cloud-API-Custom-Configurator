@@ -2,6 +2,7 @@
 
 namespace App\Command\Provider\Senetic;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpClient\HttpClient;
@@ -14,10 +15,14 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class Processor extends Product
 {
 
-    public function __construct()
+    private EntityManagerInterface $em;
+
+    public function __construct(EntityManagerInterface $entityManager)
     {
         parent::__construct();
+        $this->em = $entityManager;
     }
+
 
     /**
      * Allows to save Processor in DB
@@ -55,15 +60,19 @@ class Processor extends Product
                     "url" => $this->url(),
                     "price" => $this->price($product),
                     "providerReference" => $this->providerReference($product),
-                    "maxMemCapacity" => $this->maxMemCapacity(),
-                    "maxMemSpeed" => $this->maxMemSpeed(),
-                    "memType" => $this->memType()
+                    "maxMemCapacity" => $this->maxMemCapacity()
                 ],
             ]);
 
             if ($response->getStatusCode() != 201) {
                 dump('Error with the Senectic\Processor\saveProduct Method');
                 dd($response->getContent());
+            }
+
+            if (!is_null($this->maxMemFreq()) && !is_null($this->memType())) {
+                $memory = new \App\Command\Provider\Senetic\Table\Memory($this->detail);
+                $data = $response->toArray();
+                $memory->getCompatibleMemory($this->em, $data, $this->memType(), $this->maxMemFreq());
             }
 
             dump("==========================================================================================");
@@ -90,121 +99,121 @@ class Processor extends Product
 
     /**
      * Allows to give the number of Max CPU Configuration
-     * @return string|null
+     * @return int|null
      */
-    private function maxProcessors(): ?string
+    private function maxProcessors(): ?int
     {
         if (isset($this->detail['Configuration CPU (max)'])) {
-            return ($this->detail['Configuration CPU (max)']);
+            return intval($this->detail['Configuration CPU (max)']);
         }
         return $this->upi();
     }
 
     /**
      * Allows to give the number of Max CPU Configuration
-     * @return string|null
+     * @return int|null
      */
-    private function upi(): ?string
+    private function upi(): ?int
     {
         if (isset($this->detail['Nombre de liaisons UPI'])) {
-            return ($this->detail['Nombre de liaisons UPI']);
+            return intval($this->detail['Nombre de liaisons UPI']);
         }
         return null;
     }
 
     /**
      * Allows to give the number of cores
-     * @return string|null
+     * @return int|null
      */
-    private function cores(): ?string
+    private function cores(): ?int
     {
         if (isset($this->detail['Nombre de coeurs de processeurs'])) {
-            return ($this->detail['Nombre de coeurs de processeurs']);
+            return intval($this->detail['Nombre de coeurs de processeurs']);
         }
         return null;
     }
 
     /**
      * Allows to give the number of threads
-     * @return string|null
+     * @return int|null
      */
-    private function threads(): ?string
+    private function threads(): ?int
     {
         if (isset($this->detail['Nombre de threads du processeur'])) {
-            return ($this->detail['Nombre de threads du processeur']);
+            return intval($this->detail['Nombre de threads du processeur']);
         }
         return null;
     }
 
     /**
      * Allows to give the tdp
-     * @return string|null
+     * @return int|null
      */
-    private function tdp(): ?string
+    private function tdp(): ?int
     {
         if (isset($this->detail['Enveloppe thermique (TDP, Thermal Design Power)'])) {
-            return explode('-', $this->detail['Enveloppe thermique (TDP, Thermal Design Power)'])[0];
+            return intval(explode('-', $this->detail['Enveloppe thermique (TDP, Thermal Design Power)'])[0]);
         }
         return null;
     }
 
     /**
      * Allows to give the base frequency
-     * @return string|null
+     * @return int|null
      */
-    private function baseFeq(): ?string
+    private function baseFeq(): ?int
     {
         if (isset($this->detail['Fréquence de base du processeur'])) {
-            return explode('-', $this->detail['Fréquence de base du processeur'])[0];
+            return intval(explode('-', $this->detail['Fréquence de base du processeur'])[0]);
         }
         return null;
     }
 
     /**
      * Allows to give the boost frequency
-     * @return string|null
+     * @return int|null
      */
-    private function boostFreq(): ?string
+    private function boostFreq(): ?int
     {
         if (isset($this->detail['Fréquence du processeur Turbo'])) {
-            return explode('-', $this->detail['Fréquence du processeur Turbo'])[0];
+            return intval(explode('-', $this->detail['Fréquence du processeur Turbo'])[0]);
         }
         return null;
     }
 
     /**
      * Allows to give the cache of Processor
-     * @return string|null
+     * @return int|null
      */
-    private function cache(): ?string
+    private function cache(): ?int
     {
         if (isset($this->detail['Mémoire cache du processeur'])) {
-            return explode('-', $this->detail['Mémoire cache du processeur'])[0];
+            return intval(explode('-', $this->detail['Mémoire cache du processeur'])[0]);
         }
         return null;
     }
 
     /**
      * Allows to give the max memory size
-     * @return string|null
+     * @return int|null
      */
-    private function maxMemCapacity(): ?string
+    private function maxMemCapacity(): ?int
     {
         if (isset($this->detail['Mémoire interne maximum prise en charge par le processeur'])) {
-            return explode('-', $this->detail['Mémoire interne maximum prise en charge par le processeur'])[0];
+            return intval(explode('-', $this->detail['Mémoire interne maximum prise en charge par le processeur'])[0]);
         }
         return null;
     }
 
     /**
      * Allows to give the max memory speed
-     * @return string|null
+     * @return int|null
      */
-    private function maxMemSpeed(): ?string
+    private function maxMemFreq(): ?int
     {
         if (isset($this->detail["Vitesses d'horloge de mémoire prises en charge par le processeur"])) {
             $element = $this->detail["Vitesses d'horloge de mémoire prises en charge par le processeur"];
-            return explode('-', $element)[0];
+            return intval(explode('-', $element)[0]);
         }
         return null;
     }

@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Command\Provider\Senetic\Processor as SenecticProcessor;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -20,13 +21,21 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 class AddIntelProcessor extends ParentCommand
 {
 
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        parent::__construct();
+        $this->entityManager = $entityManager;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             parent::execute($input, $output);
             $this->start();
 
-            $processor = new SenecticProcessor();
+            $processor = new SenecticProcessor($this->entityManager);
 
             $nbrProductPage = $processor->getNumberPage("https://www.senetic.fr/intel/intel_processors/");
 
