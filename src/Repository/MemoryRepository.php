@@ -4,8 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Memory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
+use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -24,8 +23,8 @@ class MemoryRepository extends ServiceEntityRepository
     }
 
     /**
-     * @throws ORMException
-     * @throws OptimisticLockException
+     * @param Memory $entity
+     * @param bool $flush
      */
     public function add(Memory $entity, bool $flush = true): void
     {
@@ -36,8 +35,8 @@ class MemoryRepository extends ServiceEntityRepository
     }
 
     /**
-     * @throws ORMException
-     * @throws OptimisticLockException
+     * @param Memory $entity
+     * @param bool $flush
      */
     public function remove(Memory $entity, bool $flush = true): void
     {
@@ -45,6 +44,28 @@ class MemoryRepository extends ServiceEntityRepository
         if ($flush) {
             $this->_em->flush();
         }
+    }
+
+    /**
+     * Allows to get the id of all memories by a specific frequency and type
+     * @param string $type
+     * @param int $freq
+     * @return array
+     * @throws Exception
+     */
+    public function findAllMemoriesThanFreqAndType(string $type, int $freq): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $stmt = $conn->prepare(
+            "SELECT 
+                x.id
+            FROM ppe2_custom_configurator.memory x
+            WHERE x.type = substring_index(:type, '-', 1) AND x.freq <= :freq"
+        );
+        $resultSet = $stmt->executeQuery(['type' => $type, 'freq' => $freq]);
+
+        return $resultSet->fetchAllAssociative();
     }
 
     // /**

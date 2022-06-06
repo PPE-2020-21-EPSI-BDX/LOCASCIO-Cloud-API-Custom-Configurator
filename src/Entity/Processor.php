@@ -69,33 +69,22 @@ class Processor
     #[Groups(['read:Processor_detail'])]
     private ?int $threads;
 
-    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['read:Processor'])]
     private ?string $tdp;
 
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['read:Processor'])]
     private ?string $baseFreq;
 
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['read:Processor_detail'])]
     private ?string $boostFreq;
 
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['read:Processor'])]
     private ?string $cache;
 
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read:Processor_detail'])]
-    private ?string $max_mem_capacity;
-
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read:Processor_detail'])]
-    private ?string $max_mem_speed;
-
-    #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    #[Groups(['read:Processor_detail'])]
-    private ?string $mem_type;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     #[Groups(['read:Processor_detail'])]
@@ -119,6 +108,9 @@ class Processor
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['read:Processor'])]
     private ?int $availability;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $max_mem_capacity;
 
     public function getId(): ?int
     {
@@ -269,42 +261,6 @@ class Processor
         return $this;
     }
 
-    public function getMaxMemCapacity(): ?string
-    {
-        return $this->max_mem_capacity;
-    }
-
-    public function setMaxMemCapacity(?string $max_mem_capacity): self
-    {
-        $this->max_mem_capacity = $max_mem_capacity;
-
-        return $this;
-    }
-
-    public function getMaxMemSpeed(): ?string
-    {
-        return $this->max_mem_speed;
-    }
-
-    public function setMaxMemSpeed(?string $max_mem_speed): self
-    {
-        $this->max_mem_speed = $max_mem_speed;
-
-        return $this;
-    }
-
-    public function getMemType(): ?string
-    {
-        return $this->mem_type;
-    }
-
-    public function setMemType(?string $mem_type): self
-    {
-        $this->mem_type = $mem_type;
-
-        return $this;
-    }
-
     public function getApplication(): ?string
     {
         return $this->application;
@@ -373,6 +329,18 @@ class Processor
     public function setAvailability(?int $availability): self
     {
         $this->availability = $availability;
+
+        return $this;
+    }
+
+    public function getMaxMemCapacity(): ?int
+    {
+        return $this->max_mem_capacity;
+    }
+
+    public function setMaxMemCapacity(?int $max_mem_capacity): self
+    {
+        $this->max_mem_capacity = $max_mem_capacity;
 
         return $this;
     }

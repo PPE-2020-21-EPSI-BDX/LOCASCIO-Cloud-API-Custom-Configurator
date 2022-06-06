@@ -5,8 +5,6 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\RaidCardRepository;
 use DateTimeInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
@@ -47,11 +45,6 @@ class RaidCard
     #[MaxDepth(1)]
     private Connector $input_to_motherboard;
 
-    #[ORM\ManyToMany(targetEntity: Level::class, inversedBy: 'raidCards')]
-    #[Groups(['read:Level'])]
-    #[MaxDepth(1)]
-    private ArrayCollection $levels;
-
     #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['read:RaidCard'])]
     private ?int $availability;
@@ -70,13 +63,6 @@ class RaidCard
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $url;
-
-
-    public function __construct()
-    {
-        $this->levels = new ArrayCollection();
-    }
-
 
     public function getId(): ?int
     {
@@ -115,30 +101,6 @@ class RaidCard
     public function setInputToMotherboard(?Connector $input_to_motherboard): self
     {
         $this->input_to_motherboard = $input_to_motherboard;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Level>
-     */
-    public function getLevels(): Collection
-    {
-        return $this->levels;
-    }
-
-    public function addLevel(Level $level): self
-    {
-        if (!$this->levels->contains($level)) {
-            $this->levels[] = $level;
-        }
-
-        return $this;
-    }
-
-    public function removeLevel(Level $level): self
-    {
-        $this->levels->removeElement($level);
 
         return $this;
     }

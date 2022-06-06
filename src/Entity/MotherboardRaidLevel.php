@@ -8,8 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MotherboardRaidLevelRepository::class)]
 #[ApiResource(
-    collectionOperations: ['post'],
-    itemOperations: []
+    collectionOperations: ['get', 'post'],
+    itemOperations: ['get']
 )]
 class MotherboardRaidLevel
 {

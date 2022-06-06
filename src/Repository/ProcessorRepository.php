@@ -4,8 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Processor;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
+use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -24,8 +23,8 @@ class ProcessorRepository extends ServiceEntityRepository
     }
 
     /**
-     * @throws ORMException
-     * @throws OptimisticLockException
+     * @param Processor $entity
+     * @param bool $flush
      */
     public function add(Processor $entity, bool $flush = true): void
     {
@@ -36,8 +35,8 @@ class ProcessorRepository extends ServiceEntityRepository
     }
 
     /**
-     * @throws ORMException
-     * @throws OptimisticLockException
+     * @param Processor $entity
+     * @param bool $flush
      */
     public function remove(Processor $entity, bool $flush = true): void
     {
@@ -45,6 +44,28 @@ class ProcessorRepository extends ServiceEntityRepository
         if ($flush) {
             $this->_em->flush();
         }
+    }
+
+    /**
+     * Allows to get the name of all processors by a specific socket and tdp
+     * @param string $socket
+     * @param int $tdp
+     * @return array
+     * @throws Exception
+     */
+    public function findAllProcessorsThanSocketAndTdp(string $socket, int $tdp): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $stmt = $conn->prepare(
+            "SELECT 
+                x.id
+            FROM ppe2_custom_configurator.processor x
+            WHERE x.socket IN (:socket) AND x.tdp < :tdp"
+        );
+        $resultSet = $stmt->executeQuery(['socket' => $socket, 'tdp' => $tdp]);
+
+        return $resultSet->fetchAllAssociative();
     }
 
     // /**
