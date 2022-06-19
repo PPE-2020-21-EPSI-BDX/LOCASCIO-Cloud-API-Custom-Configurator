@@ -59,6 +59,13 @@ class Product
         }
     }
 
+    public function getNumberProduct(string $url){
+        $crawler = $this->browser->request('GET', $url);
+        return $crawler->filter('div.rwd-subpage-content > div.category-content-rwd > span')->each(function (Crawler $node, $i) {
+            return intval(preg_replace('/\D/', '',$node->text()));
+        });
+    }
+
     /**
      * Allow to search data for a specif url
      * @param String $url
